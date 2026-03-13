@@ -1,0 +1,12 @@
+{
+  "days": 30,
+  "bg_rows_per_day": 30000,
+  "n_conn_rows": 945622,
+  "n_prefiltered": 759,
+  "n_anomalies": 56322,
+  "n_pairs_evaluated": 5000,
+  "n_sax_pass": 1546,
+  "n_beacon_pairs": 10,
+  "n_corroborated": 4,
+  "runtime_s": 325.6
+}
