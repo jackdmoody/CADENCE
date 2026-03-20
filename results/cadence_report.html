@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CADENCE — C2 Beacon Detection Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root{
+    --bg:#080b12;--surface:#0e1420;--s2:#131926;--border:#1e2638;
+    --accent:#38bdf8;--danger:#e05c5c;--warn:#f0a500;--ok:#34d399;
+    --text:#c9d1e0;--muted:#5a6480;
+    --mono:'JetBrains Mono','Consolas',monospace;
+    --sans:'IBM Plex Sans',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13.5px;line-height:1.65}
+  a{color:var(--accent);text-decoration:none}
+
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 36px;
+    display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .hl{display:flex;align-items:center;gap:14px}
+  .hi{font-size:24px}
+  .header h1{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.3px}
+  .header p{font-size:11px;color:var(--muted);margin-top:1px}
+  .hts{font-family:var(--mono);font-size:10px;color:var(--muted)}
+
+  .main{max-width:1440px;margin:0 auto;padding:28px 36px}
+
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:18px 22px;position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
+  .card.d::before{background:var(--danger)}
+  .cnum{font-size:40px;font-weight:700;color:var(--accent);line-height:1;font-family:var(--mono)}
+  .card.d .cnum{color:var(--danger)}
+  .clbl{font-size:10px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.6px}
+
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;overflow:hidden}
+  .section-header{padding:12px 20px;border-bottom:1px solid var(--border);font-weight:600;font-size:13px;
+    color:#fff;display:flex;align-items:center;gap:8px}
+  .h-hint{font-size:11px;color:var(--muted);font-weight:400;margin-left:auto}
+  .section-body{padding:20px}
+
+  .pipe-flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:11.5px}
+  .pstage{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:7px 13px;text-align:center;min-width:95px}
+  .psname{font-weight:600;color:#fff;font-size:12px}
+  .pscount{color:var(--accent);font-size:10.5px;font-family:var(--mono);margin-top:2px}
+  .parrow{color:var(--muted);font-size:15px}
+
+  .ttable{width:100%;border-collapse:collapse;font-size:12.5px}
+  .ttable th{padding:9px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;
+    letter-spacing:.7px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2)}
+  .ttable td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .ttable tr:last-child td{border-bottom:none}
+  .ttable tr:hover td{background:var(--s2)}
+
+  .sev{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;color:#fff}
+  .sev.lg{font-size:11px;padding:4px 10px}
+  .hb{display:inline-block;width:26px;text-align:center;padding:2px 0;border-radius:3px;
+    font-size:10px;font-weight:700;margin-right:3px;font-family:var(--mono)}
+  .hb.p{background:rgba(52,211,153,.12);color:var(--ok);border:1px solid rgba(52,211,153,.3)}
+  .hb.f{background:rgba(90,100,128,.12);color:var(--muted);border:1px solid var(--border)}
+  .sbar{display:inline-block;width:56px;height:4px;background:var(--border);border-radius:2px;vertical-align:middle;margin-right:5px}
+  .sfill{height:100%;background:var(--accent);border-radius:2px}
+  .op-flag{background:rgba(224,92,92,.12);color:var(--danger);border:1px solid rgba(224,92,92,.3);
+    font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle;letter-spacing:.5px}
+  .noise-flag{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.3);
+    font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle;letter-spacing:.5px}
+  .noise-banner{background:rgba(139,92,246,.06);border-bottom:1px solid rgba(139,92,246,.2);
+    padding:11px 20px;font-size:12.5px;color:#c4b5fd;font-weight:500}
+
+  .lead-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;overflow:hidden}
+  .lead-hdr{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;
+    justify-content:space-between;flex-wrap:wrap;gap:10px;background:var(--s2)}
+  .lead-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:#fff}
+  .lrank{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .lmeta{font-size:11.5px;font-weight:400;color:var(--muted)}
+  .score-pills{display:flex;gap:10px;flex-wrap:wrap}
+  .spill{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 13px;
+    text-align:center;font-size:10.5px;color:var(--muted);line-height:1.4}
+  .spill strong{display:block;font-size:19px;font-family:var(--mono);color:var(--accent);font-weight:600}
+  .op-banner{background:rgba(224,92,92,.07);border-bottom:1px solid rgba(224,92,92,.2);
+    padding:11px 20px;font-size:12.5px;color:#e07777;font-weight:600}
+  .lead-body{display:grid;grid-template-columns:1fr 1fr 1fr}
+  .lcol{padding:17px 20px;border-right:1px solid var(--border)}
+  .lcol:last-child{border-right:none}
+  .fg{margin-bottom:13px}
+  .fl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
+  .fv{font-size:13px;color:#fff;line-height:1.5}
+  .mpill{display:inline-block;background:var(--s2);border:1px solid var(--border);border-radius:5px;
+    padding:3px 9px;font-size:11px;font-family:var(--mono);color:var(--text);margin:3px 4px 3px 0}
+  .dtag{display:inline-block;background:rgba(224,92,92,.07);border:1px solid rgba(224,92,92,.18);
+    color:#e07777;border-radius:4px;padding:2px 7px;font-family:var(--mono);font-size:10.5px;margin:2px 3px 2px 0}
+
+  .hyp{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+  .hyp:last-child{border-bottom:none}
+  .hyp.pass .hicon{color:var(--ok)}
+  .hyp.fail .hicon{color:var(--muted)}
+  .hicon{font-size:13px;flex-shrink:0;margin-top:1px;font-weight:700}
+  .hlabel{font-weight:600;color:#c0c8de;min-width:175px;flex-shrink:0;font-size:12px}
+  .hdetail{color:var(--muted);font-size:11px;font-family:var(--mono)}
+
+  .steps{list-style:none;padding:0;counter-reset:s}
+  .steps li{counter-increment:s;display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);line-height:1.5}
+  .steps li:last-child{border-bottom:none}
+  .steps li::before{content:counter(s);background:var(--s2);border:1px solid var(--border);color:var(--accent);
+    font-family:var(--mono);font-size:10px;font-weight:700;min-width:19px;height:19px;display:flex;
+    align-items:center;justify-content:center;border-radius:4px;flex-shrink:0;margin-top:2px}
+  .steps li.esc{color:#e07777}
+  .steps li.esc::before{background:rgba(224,92,92,.12);color:var(--danger);border-color:rgba(224,92,92,.3)}
+
+  .csv-buttons{display:flex;flex-wrap:wrap;gap:10px}
+  .csv-btn{display:inline-block;padding:8px 16px;background:transparent;border:1px solid var(--accent);
+    color:var(--accent);border-radius:6px;font-size:12px;font-weight:600;transition:background .15s}
+  .csv-btn:hover{background:rgba(56,189,248,.1);color:var(--accent)}
+
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:14px}
+  .fig-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .fig-title{padding:7px 13px;font-size:10px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fig-card img{width:100%;display:block;cursor:zoom-in}
+
+  .mtable{border-collapse:collapse;width:100%}
+  .mtable td{padding:7px 12px;border-bottom:1px solid var(--border)}
+  .mkey{color:var(--muted);width:180px;font-size:11px}
+  .mval{font-family:var(--mono);font-size:11px}
+
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;
+    align-items:center;justify-content:center;flex-direction:column;gap:10px}
+  .modal.open{display:flex}
+  .modal img{max-width:92vw;max-height:88vh;border-radius:6px}
+  .modal-title{color:var(--muted);font-size:11px}
+  .modal-close{position:absolute;top:16px;right:24px;font-size:26px;color:#fff;cursor:pointer}
+  .mono{font-family:var(--mono)}
+
+  @media(max-width:1024px){
+    .lead-body{grid-template-columns:1fr}
+    .lcol{border-right:none;border-bottom:1px solid var(--border)}
+    .lcol:last-child{border-bottom:none}
+    .cards{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:640px){.main{padding:16px}.gallery{grid-template-columns:1fr}.header{padding:13px 18px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hl">
+    <span class="hi">📡</span>
+    <div>
+      <h1>CADENCE — C2 Beacon Detection Report</h1>
+      <p>C2 Anomaly Detection via Ensemble Network Correlation Evidence</p>
+    </div>
+  </div>
+  <div class="hts">2026-03-20 00:57:46 UTC</div>
+</div>
+
+<div class="main">
+
+  <div class="cards">
+    <div class="card"><div class="cnum">7</div><div class="clbl">Channels Evaluated</div></div>
+    <div class="card"><div class="cnum">7</div><div class="clbl">SAX Candidates</div></div>
+    <div class="card"><div class="cnum">6</div><div class="clbl">Beacon Channels</div></div>
+    <div class="card d"><div class="cnum">4</div><div class="clbl">Confirmed Leads</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🔗 Pipeline Flow</div>
+    <div class="section-body">
+      <div class="pipe-flow">
+        <div class="pstage"><div class="psname">Conn Log</div><div class="pscount">945,589 rows</div></div>
+        <span class="parrow">→</span>
+        <div class="pstage"><div class="psname">IForest</div><div class="pscount">15,603 anomalies</div></div>
+        <span class="parrow">→</span>
+        <div class="pstage"><div class="psname">Channel Group</div><div class="pscount">7 channels</div></div>
+        <span class="parrow">→</span>
+        <div class="pstage"><div class="psname">SAX Screen</div><div class="pscount">7 pass</div></div>
+        <span class="parrow">→</span>
+        <div class="pstage"><div class="psname">ACF + FFT</div><div class="pscount">6 beacons</div></div>
+        <span class="parrow">→</span>
+        <div class="pstage"><div class="psname">PELT</div><div class="pscount">timeline</div></div>
+        <span class="parrow">→</span>
+        <div class="pstage"><div class="psname">Corroborate<br><span style="font-size:9px;color:var(--muted)">H1–H6</span></div><div class="pscount">4 confirmed</div></div>
+      </div>
+    </div>
+  </div>
+
+  
+        <div class="section">
+          <div class="section-header">🎯 Triage Summary — 4 Confirmed Leads
+            <span class="h-hint">Click a row to jump to its evidence card</span>
+          </div>
+          <div class="section-body" style="padding:0">
+            <table class="ttable">
+              <thead><tr>
+                <th>Severity</th><th>Infected Host</th><th>C2 Destination</th>
+                <th>Channel</th><th>Beacon Period</th><th>Confidence</th>
+                <th>Evidence</th><th>Est. Start</th>
+              </tr></thead>
+              <tbody>
+            <tr onclick="scrollToLead(1)" style="cursor:pointer">
+              <td><span class="sev" style="background:#e05c5c">CRITICAL</span></td>
+              <td class="mono">10.0.1.75</td>
+              <td class="mono">198.51.100.20</td>
+              <td style="font-size:11px">10.0.1.75→198.51.100.20</td>
+              <td>59.9 min</td>
+              <td>
+                <div class="sbar"><div class="sfill" style="width:97%"></div></div>
+                <span class="mono" style="font-size:11px">0.97</span>
+              </td>
+              <td><span class="hb p">H1</span><span class="hb p">H2</span><span class="hb p">H3</span><span class="hb p">H4</span><span class="hb f">H5</span><span class="hb f">H6</span></td>
+              <td class="mono" style="font-size:11px">Unknown</td>
+            </tr>
+            <tr onclick="scrollToLead(2)" style="cursor:pointer">
+              <td><span class="sev" style="background:#e05c5c">CRITICAL</span></td>
+              <td class="mono">10.0.2.100</td>
+              <td class="mono">203.0.113.55</td>
+              <td style="font-size:11px">10.0.2.100→203.0.113.55</td>
+              <td>15.1 min</td>
+              <td>
+                <div class="sbar"><div class="sfill" style="width:92%"></div></div>
+                <span class="mono" style="font-size:11px">0.92</span>
+              </td>
+              <td><span class="hb f">H1</span><span class="hb p">H2</span><span class="hb p">H3</span><span class="hb p">H4</span><span class="hb f">H5</span><span class="hb f">H6</span></td>
+              <td class="mono" style="font-size:11px">Unknown</td>
+            </tr>
+            <tr onclick="scrollToLead(3)" style="cursor:pointer">
+              <td><span class="sev" style="background:#f0a500">HIGH</span></td>
+              <td class="mono">10.0.3.200</td>
+              <td class="mono">198.51.100.99</td>
+              <td style="font-size:11px">10.0.3.200→198.51.100.99</td>
+              <td>6.0 hr</td>
+              <td>
+                <div class="sbar"><div class="sfill" style="width:96%"></div></div>
+                <span class="mono" style="font-size:11px">0.96</span>
+              </td>
+              <td><span class="hb p">H1</span><span class="hb p">H2</span><span class="hb f">H3</span><span class="hb f">H4</span><span class="hb p">H5</span><span class="hb p">H6</span></td>
+              <td class="mono" style="font-size:11px">Unknown</td>
+            </tr>
+            <tr onclick="scrollToLead(4)" style="cursor:pointer">
+              <td><span class="sev" style="background:#f0a500">HIGH</span></td>
+              <td class="mono">10.0.1.50</td>
+              <td class="mono">203.0.113.10</td>
+              <td style="font-size:11px">10.0.1.50→203.0.113.10</td>
+              <td>5.0 min</td>
+              <td>
+                <div class="sbar"><div class="sfill" style="width:95%"></div></div>
+                <span class="mono" style="font-size:11px">0.95</span>
+              </td>
+              <td><span class="hb f">H1</span><span class="hb p">H2</span><span class="hb f">H3</span><span class="hb f">H4</span><span class="hb p">H5</span><span class="hb p">H6</span></td>
+              <td class="mono" style="font-size:11px">Unknown</td>
+            </tr></tbody>
+            </table>
+          </div>
+        </div>
+  <div class="section"><div class="section-header">🔍 Evidence Cards</div><div class="section-body" style="padding:0">
+        <div class="lead-card" id="lead-1">
+          <div class="lead-hdr" style="border-left:4px solid #e05c5c">
+            <div class="lead-title">
+              <span class="lrank">#1</span>
+              <span class="sev lg" style="background:#e05c5c">CRITICAL</span>
+              10.0.1.75 → 198.51.100.20
+              <span class="lmeta">720 flows · 59.9 min beacon</span>
+            </div>
+            <div class="score-pills">
+              <div class="spill">Beacon confidence<br><strong>0.974</strong></div>
+              <div class="spill">Corroboration<br><strong>0.930</strong></div>
+              
+            </div>
+          </div>
+          
+          <div class="lead-body">
+            <div class="lcol">
+              <div class="fg"><div class="fl">INFECTED HOST</div><div class="fv mono">10.0.1.75</div></div>
+              <div class="fg"><div class="fl">C2 DESTINATION</div><div class="fv mono">198.51.100.20</div></div>
+              <div class="fg"><div class="fl">FLOWS</div><div class="fv mono">720</div></div>
+              
+              
+              <div class="mpill">DNS: 0.75</div><div class="mpill">HTTP: 0.90</div>
+              <div style="margin-top:10px"><span class="dtag">updates.dyndns-office.com</span></div>
+              
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">HYPOTHESIS RESULTS</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">DNS</div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H1 — DNS Regularity</span><span class="hdetail">DNS query period matches conn period</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H2 — DNS Anomaly Indicators</span><span class="hdetail">FastFlux: 3 domains</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">HTTP</div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H3 — HTTP Consistency</span><span class="hdetail">body_CV=0.025  uri_CV=0.000  path_CV=0.000  score=1.00</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H4 — HTTP Evasion</span><span class="hdetail">rare UA  |  UA monotony  |  high-entropy URI</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">TLS</div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H5 — TLS Consistency</span><span class="hdetail">no consistency signals</span></div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H6 — TLS Evasion</span><span class="hdetail">no evasion signals</span></div>
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">SUGGESTED NEXT STEPS</div>
+              <ol class="steps"><li class="">Block outbound to 198.51.100.20 at the perimeter firewall.</li><li class="">Isolate 10.0.1.75 from the network pending investigation.</li><li class="">Search SIEM for all outbound traffic from 10.0.1.75 to identify lateral movement and data staging.</li><li class="">Fast-flux DNS detected (3 rotating-IP domains). Enrich destination IPs in TI to identify C2 provider / bulletproof hosting.</li><li class="">Pull full HTTP session logs for 10.0.1.75 → 198.51.100.20. Evasion indicators: globally rare User-Agent; monotonic UA (always same string); high-entropy URI (encoded payload). Decode URI payloads for C2 command content.</li></ol>
+            </div>
+          </div>
+        </div>
+        <div class="lead-card" id="lead-2">
+          <div class="lead-hdr" style="border-left:4px solid #e05c5c">
+            <div class="lead-title">
+              <span class="lrank">#2</span>
+              <span class="sev lg" style="background:#e05c5c">CRITICAL</span>
+              10.0.2.100 → 203.0.113.55
+              <span class="lmeta">2,872 flows · 15.1 min beacon</span>
+            </div>
+            <div class="score-pills">
+              <div class="spill">Beacon confidence<br><strong>0.925</strong></div>
+              <div class="spill">Corroboration<br><strong>0.710</strong></div>
+              
+            </div>
+          </div>
+          
+          <div class="lead-body">
+            <div class="lcol">
+              <div class="fg"><div class="fl">INFECTED HOST</div><div class="fv mono">10.0.2.100</div></div>
+              <div class="fg"><div class="fl">C2 DESTINATION</div><div class="fv mono">203.0.113.55</div></div>
+              <div class="fg"><div class="fl">FLOWS</div><div class="fv mono">2,872</div></div>
+              
+              
+              <div class="mpill">DNS: 0.65</div><div class="mpill">HTTP: 0.65</div>
+              
+              
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">HYPOTHESIS RESULTS</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">DNS</div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H1 — DNS Regularity</span><span class="hdetail">DNS query period matches conn period</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H2 — DNS Anomaly Indicators</span><span class="hdetail">DGA: llcrt28njp3yvm.com, 9r5z75dkg26lt.com  |  NXD: 858 (28%)  |  FastFlux: 3 domains</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">HTTP</div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H3 — HTTP Consistency</span><span class="hdetail">body_CV=0.064  uri_CV=0.000  path_CV=0.000  score=1.00</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H4 — HTTP Evasion</span><span class="hdetail">UA monotony  |  high-entropy URI</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">TLS</div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H5 — TLS Consistency</span><span class="hdetail">no consistency signals</span></div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H6 — TLS Evasion</span><span class="hdetail">no evasion signals</span></div>
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">SUGGESTED NEXT STEPS</div>
+              <ol class="steps"><li class="">Block outbound to 203.0.113.55 at the perimeter firewall.</li><li class="">Isolate 10.0.2.100 from the network pending investigation.</li><li class="">Search SIEM for all outbound traffic from 10.0.2.100 to identify lateral movement and data staging.</li><li class="">Acquire memory image from 10.0.2.100. DGA domain generation (llcrt28njp3yvm.com, 9r5z75dkg26lt.com) indicates an in-memory implant (Cobalt Strike, Sliver, Havoc, or similar). Run volatility/malfind against the image.</li><li class="">Pull full HTTP session logs for 10.0.2.100 → 203.0.113.55. Evasion indicators: monotonic UA (always same string); high-entropy URI (encoded payload). Decode URI payloads for C2 command content.</li></ol>
+            </div>
+          </div>
+        </div>
+        <div class="lead-card" id="lead-3">
+          <div class="lead-hdr" style="border-left:4px solid #f0a500">
+            <div class="lead-title">
+              <span class="lrank">#3</span>
+              <span class="sev lg" style="background:#f0a500">HIGH</span>
+              10.0.3.200 → 198.51.100.99
+              <span class="lmeta">119 flows · 6.0 hr beacon</span>
+            </div>
+            <div class="score-pills">
+              <div class="spill">Beacon confidence<br><strong>0.959</strong></div>
+              <div class="spill">Corroboration<br><strong>0.674</strong></div>
+              <div class='spill'>TLS score<br><strong>0.435</strong></div>
+            </div>
+          </div>
+          
+          <div class="lead-body">
+            <div class="lcol">
+              <div class="fg"><div class="fl">INFECTED HOST</div><div class="fv mono">10.0.3.200</div></div>
+              <div class="fg"><div class="fl">C2 DESTINATION</div><div class="fv mono">198.51.100.99</div></div>
+              <div class="fg"><div class="fl">FLOWS</div><div class="fv mono">119</div></div>
+              
+              
+              <div class="mpill">DNS: 0.75</div><div class="mpill">HTTP: 0.00</div><div class="mpill">TLS: 0.43</div>
+              <div style="margin-top:10px"><span class="dtag">cdn.analytics-platform.net</span></div>
+              <div style="margin-top:10px"><span class="dtag">cdn.analytics-platform.net</span></div>
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">HYPOTHESIS RESULTS</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">DNS</div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H1 — DNS Regularity</span><span class="hdetail">DNS query period matches conn period</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H2 — DNS Anomaly Indicators</span><span class="hdetail">FastFlux: 3 domains</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">HTTP</div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H3 — HTTP Consistency</span><span class="hdetail">body_CV=nan  uri_CV=nan  path_CV=nan  score=0.00</span></div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H4 — HTTP Evasion</span><span class="hdetail">none</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">TLS</div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H5 — TLS Consistency</span><span class="hdetail">SNI stable  |  JA3 monotonic  |  cert reused  |  JA3: e7d705a3286e19ea…</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H6 — TLS Evasion</span><span class="hdetail">known C2 JA3  |  high resumption</span></div>
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">SUGGESTED NEXT STEPS</div>
+              <ol class="steps"><li class="">Block outbound to 198.51.100.99 at the perimeter firewall.</li><li class="">Isolate 10.0.3.200 from the network pending investigation.</li><li class="">Search SIEM for all outbound traffic from 10.0.3.200 to identify lateral movement and data staging.</li><li class="">Fast-flux DNS detected (3 rotating-IP domains). Enrich destination IPs in TI to identify C2 provider / bulletproof hosting.</li><li class="">Capture and analyse TLS handshake from 10.0.3.200 to 198.51.100.99. TLS evasion indicators: known C2 JA3 fingerprint matched; unusually high TLS session resumption rate. Compare JA3/JA3S fingerprints against known C2 framework signatures.</li></ol>
+            </div>
+          </div>
+        </div>
+        <div class="lead-card" id="lead-4">
+          <div class="lead-hdr" style="border-left:4px solid #f0a500">
+            <div class="lead-title">
+              <span class="lrank">#4</span>
+              <span class="sev lg" style="background:#f0a500">HIGH</span>
+              10.0.1.50 → 203.0.113.10
+              <span class="lmeta">8,626 flows · 5.0 min beacon</span>
+            </div>
+            <div class="score-pills">
+              <div class="spill">Beacon confidence<br><strong>0.950</strong></div>
+              <div class="spill">Corroboration<br><strong>0.566</strong></div>
+              <div class='spill'>TLS score<br><strong>0.390</strong></div>
+            </div>
+          </div>
+          
+          <div class="lead-body">
+            <div class="lcol">
+              <div class="fg"><div class="fl">INFECTED HOST</div><div class="fv mono">10.0.1.50</div></div>
+              <div class="fg"><div class="fl">C2 DESTINATION</div><div class="fv mono">203.0.113.10</div></div>
+              <div class="fg"><div class="fl">FLOWS</div><div class="fv mono">8,626</div></div>
+              
+              
+              <div class="mpill">DNS: 0.65</div><div class="mpill">HTTP: 0.00</div><div class="mpill">TLS: 0.39</div>
+              
+              
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">HYPOTHESIS RESULTS</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">DNS</div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H1 — DNS Regularity</span><span class="hdetail">DNS query period matches conn period</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H2 — DNS Anomaly Indicators</span><span class="hdetail">DGA: nrpj5hbvt7jxz.com, r971qm37sh804.com  |  NXD: 2563 (29%)  |  FastFlux: 3 domains</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">HTTP</div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H3 — HTTP Consistency</span><span class="hdetail">body_CV=nan  uri_CV=nan  path_CV=nan  score=0.00</span></div>
+              <div class="hyp fail"><span class="hicon">✗</span><span class="hlabel">H4 — HTTP Evasion</span><span class="hdetail">none</span></div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+                color:var(--muted);margin:10px 0 5px">TLS</div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H5 — TLS Consistency</span><span class="hdetail">JA3 monotonic  |  cert reused  |  JA3: e7d705a3286e19ea…</span></div>
+              <div class="hyp pass"><span class="hicon">✓</span><span class="hlabel">H6 — TLS Evasion</span><span class="hdetail">known C2 JA3  |  absent SNI  |  high resumption</span></div>
+            </div>
+            <div class="lcol">
+              <div class="fl" style="margin-bottom:8px">SUGGESTED NEXT STEPS</div>
+              <ol class="steps"><li class="">Block outbound to 203.0.113.10 at the perimeter firewall.</li><li class="">Isolate 10.0.1.50 from the network pending investigation.</li><li class="">Search SIEM for all outbound traffic from 10.0.1.50 to identify lateral movement and data staging.</li><li class="">Acquire memory image from 10.0.1.50. DGA domain generation (nrpj5hbvt7jxz.com, r971qm37sh804.com) indicates an in-memory implant (Cobalt Strike, Sliver, Havoc, or similar). Run volatility/malfind against the image.</li><li class="">Capture and analyse TLS handshake from 10.0.1.50 to 203.0.113.10. TLS evasion indicators: known C2 JA3 fingerprint matched; absent SNI (raw IP connection); unusually high TLS session resumption rate. Compare JA3/JA3S fingerprints against known C2 framework signatures.</li></ol>
+            </div>
+          </div>
+        </div></div></div>
+
+  <div class="section">
+    <div class="section-header">📥 Download Results</div>
+    <div class="section-body"><div class="csv-buttons"><a class="csv-btn" href="data:text/csv;base64,Y2hhbm5lbF9pZCxwYWlyX2lkLHNyY19pcCxkc3RfaXAsZmxvd19jb3VudCxiZWFjb25fY29uZmlkZW5jZSxkb21pbmFudF9wZXJpb2RfcyxieXRlc19jdixhdmdfdG90YWxfYnl0ZXMscGVyc2lzdGVuY2VfcmF0aW8sZHVyYXRpb25fc3RkLG9mZl9ob3VyX2Nvbm5lY3Rpb25zLHNjb3JlX2JlYWNvbixzY29yZV9wYXlsb2FkLHNjb3JlX3BlcnNpc3RlbmNlLHNjb3JlX3BlcmlvZF9hZ3JlZSxzY29yZV90ZW1wb3JhbCxwcmlvcml0eV9zY29yZQ0KMTAuMC4xLjc14oaSMTk4LjUxLjEwMC4yMCwxMC4wLjEuNzXihpIxOTguNTEuMTAwLjIwLDEwLjAuMS43NSwxOTguNTEuMTAwLjIwLDcyMCwwLjk3NDQsMzU5MS4yLDAuMDMwNCwzMzEuODYsMS4wMDE0LDAuMDEsMjM5LDQsMiwyLDEsMSwxMA0KMTAuMC4xLjUw4oaSMjAzLjAuMTEzLjEwLDEwLjAuMS41MOKGkjIwMy4wLjExMy4xMCwxMC4wLjEuNTAsMjAzLjAuMTEzLjEwLDg2MjYsMC45NTAxLDMwMC4zLDAuMDUwMSw2NjQuODUsMS4wMDAxLDAuMDEsMjg3OCw0LDIsMiwxLDEsMTANCjEwLjAuMS4zMOKGkjIxNi4yMzkuMzUuMCwxMC4wLjEuMzDihpIyMTYuMjM5LjM1LjAsMTAuMC4xLjMwLDIxNi4yMzkuMzUuMCwyNTI2LDAuOTc0OCwxMDI2LjAsMC4wMTA2LDYxLjQ2LDEuMDAwNSwwLjAwOTgsODQxLDQsMiwyLDEsMSwxMA0KMTAuMC4yLjEwMOKGkjIwMy4wLjExMy41NSwxMC4wLjIuMTAw4oaSMjAzLjAuMTEzLjU1LDEwLjAuMi4xMDAsMjAzLjAuMTEzLjU1LDI4NzIsMC45MjQ5LDkwNC43LDAuMDgwNiwxMzMwLjc0LDEuMDAwNywwLjAxLDk1Niw0LDIsMiwxLDEsMTANCjEwLjAuMS4yMOKGkjEzLjEwNy40LjUwLDEwLjAuMS4yMOKGkjEzLjEwNy40LjUwLDEwLjAuMS4yMCwxMy4xMDcuNC41MCw3MjYsMC44OTk0LDM1OTIuMCwwLjMwMzIsMTA0MTIuMDQsMS4wMDEzLDAuMDA5OSwyNTAsNCwwLDIsMSwxLDgNCjEwLjAuMy4yMDDihpIxOTguNTEuMTAwLjk5LDEwLjAuMy4yMDDihpIxOTguNTEuMTAwLjk5LDEwLjAuMy4yMDAsMTk4LjUxLjEwMC45OSwxMTksMC45NTkzLDIxNjg3LjQsMC40NDY5LDY2NzE1LjI5LDEuMDE0NCwwLjAwOTYsMzYsNCwwLDIsMSwxLDgNCjEwLjAuMS4xNjHihpI1Mi4xOTUuMjA4LjE0LDEwLjAuMS4xNjHihpI1Mi4xOTUuMjA4LjE0LDEwLjAuMS4xNjEsNTIuMTk1LjIwOC4xNCwxNCwwLjQsMTgwNTcwLjksMS4zMTI2LDQ3MTYwLjkzLDAuNTE1MSwyLjY4MzIsMywyLDAsMSwwLDEsNA0K" download="priority.csv">⬇ Priority Table</a>
+<a class="csv-btn" href="data:text/csv;base64,Y2hhbm5lbF9pZCxwYWlyX2lkLHNyY19pcCxkc3RfaXAsZG9taW5hbnRfcGVyaW9kX3MsYWNmX3BlYWssYWNmX3BlYWtfbGFnLGlhdF9jdixmZnRfcGVyaW9kX3MsZmZ0X3Bvd2VyX3JhdGlvLG5fb2JzZXJ2YXRpb25zLGlzX3BlcmlvZGljLGJlYWNvbl9jb25maWRlbmNlLGlzX2JlYWNvbl9wYWlyDQoxMC4wLjEuMzDihpIyMTYuMjM5LjM1LjAsMTAuMC4xLjMw4oaSMjE2LjIzOS4zNS4wLDEwLjAuMS4zMCwyMTYuMjM5LjM1LjAsMTAyNi4wLDAuODM2OSwyLDAuMDUwNCw2NC4wLDEuMCwyNTI2LFRydWUsMC45NzQ4LFRydWUNCjEwLjAuMS43NeKGkjE5OC41MS4xMDAuMjAsMTAuMC4xLjc14oaSMTk4LjUxLjEwMC4yMCwxMC4wLjEuNzUsMTk4LjUxLjEwMC4yMCwzNTkxLjIsMC43Nzk1LDIsMC4wNTExLDY0LjAsMS4wLDcyMCxUcnVlLDAuOTc0NCxUcnVlDQoxMC4wLjMuMjAw4oaSMTk4LjUxLjEwMC45OSwxMC4wLjMuMjAw4oaSMTk4LjUxLjEwMC45OSwxMC4wLjMuMjAwLDE5OC41MS4xMDAuOTksMjE2ODcuNCwwLjcwMzQsMiwwLjA4MTUsNjQuMCwxLjAsMTE5LFRydWUsMC45NTkzLFRydWUNCjEwLjAuMS41MOKGkjIwMy4wLjExMy4xMCwxMC4wLjEuNTDihpIyMDMuMC4xMTMuMTAsMTAuMC4xLjUwLDIwMy4wLjExMy4xMCwzMDAuMywwLjY4MjksMiwwLjA5OTcsNjQuMCwxLjAsODYyNixUcnVlLDAuOTUwMSxUcnVlDQoxMC4wLjIuMTAw4oaSMjAzLjAuMTEzLjU1LDEwLjAuMi4xMDDihpIyMDMuMC4xMTMuNTUsMTAuMC4yLjEwMCwyMDMuMC4xMTMuNTUsOTA0LjcsMC41NTcyLDIsMC4xNTAyLDY0LjAsMS4wLDI4NzIsVHJ1ZSwwLjkyNDksVHJ1ZQ0KMTAuMC4xLjIw4oaSMTMuMTA3LjQuNTAsMTAuMC4xLjIw4oaSMTMuMTA3LjQuNTAsMTAuMC4xLjIwLDEzLjEwNy40LjUwLDM1OTIuMCwwLjQ1NzcsMiwwLjIwMTEsNjQuMCwxLjAsNzI2LFRydWUsMC44OTk0LFRydWUNCjEwLjAuMS4xNjHihpI1Mi4xOTUuMjA4LjE0LDEwLjAuMS4xNjHihpI1Mi4xOTUuMjA4LjE0LDEwLjAuMS4xNjEsNTIuMTk1LjIwOC4xNCwxODA1NzAuOSwwLjM0NjQsNCwxLjA2NDMsMC4wLDAuMCwxNCxGYWxzZSwwLjQsRmFsc2UNCg==" download="periodicity.csv">⬇ Periodicity Scores</a>
+<a class="csv-btn" href="data:text/csv;base64,bl9jaGFuZ2Vwb2ludHMsY2hhbmdlcG9pbnRfdGltZXMsYmVhY29uX3N0YXJ0X3RzLGJlYWNvbl9zdGFydF9kdCxwcmVfc3RhcnRfaWF0X21lYW4scG9zdF9zdGFydF9pYXRfbWVhbixpbnRlcnZhbF9zaGlmdHMsaGFzX2ludGVydmFsX3NoaWZ0LHBlbHRfY29zdCxwYWlyX2lkLHNyY19pcCxkc3RfaXAsZG9taW5hbnRfcGVyaW9kX3MNCjAsW10sLCwsLFtdLEZhbHNlLCwxMC4wLjEuMzDihpIyMTYuMjM5LjM1LjAsMTAuMC4xLjMwLDIxNi4yMzkuMzUuMCwxMDI2LjANCjAsW10sLCwsLFtdLEZhbHNlLCwxMC4wLjEuNzXihpIxOTguNTEuMTAwLjIwLDEwLjAuMS43NSwxOTguNTEuMTAwLjIwLDM1OTEuMg0KMCxbXSwsLCwsW10sRmFsc2UsLDEwLjAuMy4yMDDihpIxOTguNTEuMTAwLjk5LDEwLjAuMy4yMDAsMTk4LjUxLjEwMC45OSwyMTY4Ny40DQowLFtdLCwsLCxbXSxGYWxzZSwsMTAuMC4xLjUw4oaSMjAzLjAuMTEzLjEwLDEwLjAuMS41MCwyMDMuMC4xMTMuMTAsMzAwLjMNCjAsW10sLCwsLFtdLEZhbHNlLCwxMC4wLjIuMTAw4oaSMjAzLjAuMTEzLjU1LDEwLjAuMi4xMDAsMjAzLjAuMTEzLjU1LDkwNC43DQowLFtdLCwsLCxbXSxGYWxzZSwsMTAuMC4xLjIw4oaSMTMuMTA3LjQuNTAsMTAuMC4xLjIwLDEzLjEwNy40LjUwLDM1OTIuMA0K" download="changepoints.csv">⬇ Changepoint Analysis</a>
+<a class="csv-btn" href="data:text/csv;base64,Y2hhbm5lbF9pZCxwYWlyX2lkLHNyY19pcCxkc3RfaXAsZmxvd19jb3VudCxiZWFjb25fY29uZmlkZW5jZSxkb21pbmFudF9wZXJpb2Rfcyxpc19wZXJpb2RpYyxoMV9kbnNfcmVndWxhcml0eSxoMV9kbnNfcGVyaW9kX3MsaDFfcGVyaW9kX2RlbHRhX3BjdCxoMl9kbnNfYW5vbWFseSxoMl9kZ2FfZG9tYWluX2NvdW50LGgyX254ZG9tYWluX2NvdW50LGgyX254ZG9tYWluX3JhdGUsaDJfc2hvcnRfdHRsX2NvdW50LGgyX2Zhc3RfZmx1eF9jb3VudCxoMl9kZ2FfZG9tYWlucyxoMl9mYXN0X2ZsdXhfZG9tYWlucyxoM19odHRwX2NvbnNpc3RlbmN5LGgzX3Jlc3BvbnNlX2JvZHlfY3YsaDNfdXJpX2xlbl9jdixoM19wYXRoX2N2LGgzX2NvbnNpc3RlbmN5X3Njb3JlLGg0X2V2YXNpb25faW5kaWNhdG9ycyxoNF9yYXJlX3VhLGg0X3VhX21vbm90b255LGg0X2hpZ2hfdXJpX2VudHJvcHksaDRfYWJub3JtYWxfbWV0aG9kcyxoNV90bHNfY29uc2lzdGVuY3ksaDVfc25pX3N0YWJsZSxoNV9qYTNfbW9ub3RvbmljLGg1X2NlcnRfcmV1c2VkLGg2X3Rsc19ldmFzaW9uLGg2X3NlbGZfc2lnbmVkLGg2X2tub3duX2MyX2phMyxoNl9hYnNlbnRfc25pLGg2X2hpZ2hfcmVzdW1wdGlvbixkbnNfc2NvcmUsaHR0cF9zY29yZSx0bHNfc2NvcmUsY29ycm9ib3JhdGlvbl9zY29yZSxjb3Jyb2JvcmF0ZWQsbWF0Y2hlZF9kb21haW5zLHVuaXF1ZV91c2VyX2FnZW50cyxvYnNlcnZlZF9zbmlzLG9ic2VydmVkX2phM3MsbWl0cmVfdGVjaG5pcXVlcw0KMTAuMC4xLjc14oaSMTk4LjUxLjEwMC4yMCwxMC4wLjEuNzXihpIxOTguNTEuMTAwLjIwLDEwLjAuMS43NSwxOTguNTEuMTAwLjIwLDcyMCwwLjk3NDQsMzU5MS4yLFRydWUsVHJ1ZSwzNTkxLjAsMC4wMDAxLFRydWUsMCwwLDAuMCwwLDMsW10sIlsnY2RuLmNsb3VkZmxhcmUuY29tJywgJ2Rucy5nb29nbGUnLCAnbG9naW4ubWljcm9zb2Z0b25saW5lLmNvbSddIixUcnVlLDAuMDI1MywwLjAsMC4wLDEuMCxUcnVlLFRydWUsVHJ1ZSxUcnVlLFtdLEZhbHNlLEZhbHNlLEZhbHNlLEZhbHNlLEZhbHNlLEZhbHNlLEZhbHNlLEZhbHNlLEZhbHNlLDAuNzUsMC45LDAuMCwwLjkzLFRydWUsWyd1cGRhdGVzLmR5bmRucy1vZmZpY2UuY29tJ10sWydNb3ppbGxhLzQuMCAoY29tcGF0aWJsZTsgTVNJRSA2LjApJ10sW10sW10sIlt7J25hbWUnOiAnU2NoZWR1bGVkIFRyYW5zZmVyJywgJ3RhY3RpYyc6ICdFeGZpbHRyYXRpb24nLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxMDI5LycsICdkZXNjcmlwdGlvbic6ICdEYXRhIGV4ZmlsdHJhdGlvbiBhdCBzY2hlZHVsZWQgaW50ZXJ2YWxzIG1hdGNoaW5nIGJlYWNvbiB0aW1pbmcuJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTAyOScsICdldmlkZW5jZSc6ICdTY2hlZHVsZWQgYmVhY29uIGludGVydmFsOiAzNTkxcyAoY29uZmlkZW5jZTogMC45NzQpJ30sIHsnbmFtZSc6ICdBcHBsaWNhdGlvbiBMYXllciBQcm90b2NvbDogRE5TJywgJ3RhY3RpYyc6ICdDb21tYW5kIGFuZCBDb250cm9sJywgJ3VybCc6ICdodHRwczovL2F0dGFjay5taXRyZS5vcmcvdGVjaG5pcXVlcy9UMTA3MS8wMDQvJywgJ2Rlc2NyaXB0aW9uJzogJ0MyIGNvbW11bmljYXRpb24gdHVubmVsZWQgb3ZlciBETlMgcXVlcmllcyBhbmQgcmVzcG9uc2VzLicsICd0ZWNobmlxdWVfaWQnOiAnVDEwNzEuMDA0JywgJ2V2aWRlbmNlJzogJ0ROUyBxdWVyeSBwZXJpb2QgbWF0Y2hlcyBjb25uLWxvZyBiZWFjb24gcGVyaW9kLCBpbmRpY2F0aW5nIEROUy1sYXllciBDMiBjb21tdW5pY2F0aW9uJ30sIHsnbmFtZSc6ICdBcHBsaWNhdGlvbiBMYXllciBQcm90b2NvbDogV2ViIFByb3RvY29scycsICd0YWN0aWMnOiAnQ29tbWFuZCBhbmQgQ29udHJvbCcsICd1cmwnOiAnaHR0cHM6Ly9hdHRhY2subWl0cmUub3JnL3RlY2huaXF1ZXMvVDEwNzEvMDAxLycsICdkZXNjcmlwdGlvbic6ICdDMiBjb21tdW5pY2F0aW9uIG92ZXIgSFRUUC9IVFRQUyB0byBibGVuZCB3aXRoIG5vcm1hbCB3ZWIgdHJhZmZpYy4nLCAndGVjaG5pcXVlX2lkJzogJ1QxMDcxLjAwMScsICdldmlkZW5jZSc6ICdTdGVyZW90eXBlZCBIVFRQIHBhdHRlcm5zIChib2R5X0NWPTAuMDI1LCB1cmlfQ1Y9MC4wMDApIGNvbnNpc3RlbnQgd2l0aCBhdXRvbWF0ZWQgQzIgcG9sbGluZyd9LCB7J25hbWUnOiAnTWFzcXVlcmFkaW5nJywgJ3RhY3RpYyc6ICdEZWZlbnNlIEV2YXNpb24nLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxMDM2LycsICdkZXNjcmlwdGlvbic6ICdCZWFjb24gdHJhZmZpYyBkaXNndWlzZWQgYXMgbGVnaXRpbWF0ZSBzZXJ2aWNlIGNvbW11bmljYXRpb24uJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTAzNicsICdldmlkZW5jZSc6ICdSYXJlIG9yIGFic2VudCBVc2VyLUFnZW50IHN0cmluZyDigJQgYmVhY29uIG1hc3F1ZXJhZGluZyBhcyBsZWdpdGltYXRlIHRyYWZmaWMnfSwgeyduYW1lJzogJ0RhdGEgRW5jb2RpbmcnLCAndGFjdGljJzogJ0NvbW1hbmQgYW5kIENvbnRyb2wnLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxMTMyLycsICdkZXNjcmlwdGlvbic6ICdTdGFuZGFyZCBvciBjdXN0b20gZW5jb2Rpbmcgb2YgQzIgZGF0YSAoZS5nLiwgYmFzZTY0IGluIFVSSSkuJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTEzMicsICdldmlkZW5jZSc6ICdIaWdoLWVudHJvcHkgVVJJIGluZGljYXRlcyBlbmNvZGVkIEMyIHBheWxvYWQgZGF0YSd9LCB7J25hbWUnOiAnRGF0YSBPYmZ1c2NhdGlvbicsICd0YWN0aWMnOiAnQ29tbWFuZCBhbmQgQ29udHJvbCcsICd1cmwnOiAnaHR0cHM6Ly9hdHRhY2subWl0cmUub3JnL3RlY2huaXF1ZXMvVDEwMDEvJywgJ2Rlc2NyaXB0aW9uJzogJ0MyIGRhdGEgZW5jb2RlZCBvciBvYmZ1c2NhdGVkIHdpdGhpbiBwcm90b2NvbCBwYXlsb2Fkcy4nLCAndGVjaG5pcXVlX2lkJzogJ1QxMDAxJywgJ2V2aWRlbmNlJzogJ09iZnVzY2F0ZWQgZGF0YSBpbiBIVFRQIFVSSSBzdWdnZXN0cyBDMiBjb21tYW5kL3Jlc3BvbnNlIGVuY29kaW5nJ30sIHsnbmFtZSc6ICdFeGZpbHRyYXRpb24gT3ZlciBDMiBDaGFubmVsJywgJ3RhY3RpYyc6ICdFeGZpbHRyYXRpb24nLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxMDQxLycsICdkZXNjcmlwdGlvbic6ICdEYXRhIGV4ZmlsdHJhdGVkIG92ZXIgdGhlIHNhbWUgY2hhbm5lbCB1c2VkIGZvciBDMi4nLCAndGVjaG5pcXVlX2lkJzogJ1QxMDQxJywgJ2V2aWRlbmNlJzogJ1N1c3RhaW5lZCBwZXJpb2RpYyBjb21tdW5pY2F0aW9uICg3MjAgZmxvd3MpIG92ZXIgYmVhY29uIGNoYW5uZWwgbWF5IGluZGljYXRlIGRhdGEgZXhmaWx0cmF0aW9uJ31dIg0KMTAuMC4yLjEwMOKGkjIwMy4wLjExMy41NSwxMC4wLjIuMTAw4oaSMjAzLjAuMTEzLjU1LDEwLjAuMi4xMDAsMjAzLjAuMTEzLjU1LDI4NzIsMC45MjQ5LDkwNC43LFRydWUsRmFsc2UsMC4wLDEuMCxUcnVlLDEwLDg1OCwwLjI3NjUsMCwzLCJbJ2xsY3J0MjhuanAzeXZtLmNvbScsICc5cjV6NzVka2cyNmx0LmNvbScsICd4eTNkaGw4YnlqMnozYy5jb20nLCAnZjR6anl3M3Foa2Q0eG4uY29tJywgJ2xxc3AxZmNnbjQyZ3cuY29tJywgJ2hnM3BqY3Q2NjhyeGg5LmNvbScsICd0YmRqcnBtZm45eDEuY29tJywgJ3Njc2M5N3k0ZGs2Z2ZyLmNvbScsICczdmxzcTgwNXk3Z2prNi5jb20nLCAnMmM3dDV4NXk3djAxemouY29tJ10iLCJbJ2Nkbi5jbG91ZGZsYXJlLmNvbScsICdkbnMuZ29vZ2xlJywgJ2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20nXSIsVHJ1ZSwwLjA2MzYsMC4wLDAuMCwxLjAsVHJ1ZSxGYWxzZSxUcnVlLFRydWUsW10sRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsMC42NSwwLjY1LDAuMCwwLjcxLFRydWUsW10sW10sW10sW10sIlt7J25hbWUnOiAnU2NoZWR1bGVkIFRyYW5zZmVyJywgJ3RhY3RpYyc6ICdFeGZpbHRyYXRpb24nLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxMDI5LycsICdkZXNjcmlwdGlvbic6ICdEYXRhIGV4ZmlsdHJhdGlvbiBhdCBzY2hlZHVsZWQgaW50ZXJ2YWxzIG1hdGNoaW5nIGJlYWNvbiB0aW1pbmcuJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTAyOScsICdldmlkZW5jZSc6ICdTY2hlZHVsZWQgYmVhY29uIGludGVydmFsOiA5MDVzIChjb25maWRlbmNlOiAwLjkyNSknfSwgeyduYW1lJzogJ0R5bmFtaWMgUmVzb2x1dGlvbjogRG9tYWluIEdlbmVyYXRpb24gQWxnb3JpdGhtcycsICd0YWN0aWMnOiAnQ29tbWFuZCBhbmQgQ29udHJvbCcsICd1cmwnOiAnaHR0cHM6Ly9hdHRhY2subWl0cmUub3JnL3RlY2huaXF1ZXMvVDE1NjgvMDAyLycsICdkZXNjcmlwdGlvbic6ICdBbGdvcml0aG1pY2FsbHkgZ2VuZXJhdGVkIGRvbWFpbnMgZm9yIEMyIHJlbmRlenZvdXMuJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTU2OC4wMDInLCAnZXZpZGVuY2UnOiAnREdBLWdlbmVyYXRlZCBkb21haW5zIGRldGVjdGVkOiBsbGNydDI4bmpwM3l2bS5jb20sIDlyNXo3NWRrZzI2bHQuY29tLCB4eTNkaGw4YnlqMnozYy5jb20nfSwgeyduYW1lJzogJ0FwcGxpY2F0aW9uIExheWVyIFByb3RvY29sOiBXZWIgUHJvdG9jb2xzJywgJ3RhY3RpYyc6ICdDb21tYW5kIGFuZCBDb250cm9sJywgJ3VybCc6ICdodHRwczovL2F0dGFjay5taXRyZS5vcmcvdGVjaG5pcXVlcy9UMTA3MS8wMDEvJywgJ2Rlc2NyaXB0aW9uJzogJ0MyIGNvbW11bmljYXRpb24gb3ZlciBIVFRQL0hUVFBTIHRvIGJsZW5kIHdpdGggbm9ybWFsIHdlYiB0cmFmZmljLicsICd0ZWNobmlxdWVfaWQnOiAnVDEwNzEuMDAxJywgJ2V2aWRlbmNlJzogJ1N0ZXJlb3R5cGVkIEhUVFAgcGF0dGVybnMgKGJvZHlfQ1Y9MC4wNjQsIHVyaV9DVj0wLjAwMCkgY29uc2lzdGVudCB3aXRoIGF1dG9tYXRlZCBDMiBwb2xsaW5nJ30sIHsnbmFtZSc6ICdEYXRhIEVuY29kaW5nJywgJ3RhY3RpYyc6ICdDb21tYW5kIGFuZCBDb250cm9sJywgJ3VybCc6ICdodHRwczovL2F0dGFjay5taXRyZS5vcmcvdGVjaG5pcXVlcy9UMTEzMi8nLCAnZGVzY3JpcHRpb24nOiAnU3RhbmRhcmQgb3IgY3VzdG9tIGVuY29kaW5nIG9mIEMyIGRhdGEgKGUuZy4sIGJhc2U2NCBpbiBVUkkpLicsICd0ZWNobmlxdWVfaWQnOiAnVDExMzInLCAnZXZpZGVuY2UnOiAnSGlnaC1lbnRyb3B5IFVSSSBpbmRpY2F0ZXMgZW5jb2RlZCBDMiBwYXlsb2FkIGRhdGEnfSwgeyduYW1lJzogJ0RhdGEgT2JmdXNjYXRpb24nLCAndGFjdGljJzogJ0NvbW1hbmQgYW5kIENvbnRyb2wnLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxMDAxLycsICdkZXNjcmlwdGlvbic6ICdDMiBkYXRhIGVuY29kZWQgb3Igb2JmdXNjYXRlZCB3aXRoaW4gcHJvdG9jb2wgcGF5bG9hZHMuJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTAwMScsICdldmlkZW5jZSc6ICdPYmZ1c2NhdGVkIGRhdGEgaW4gSFRUUCBVUkkgc3VnZ2VzdHMgQzIgY29tbWFuZC9yZXNwb25zZSBlbmNvZGluZyd9LCB7J25hbWUnOiAnRXhmaWx0cmF0aW9uIE92ZXIgQzIgQ2hhbm5lbCcsICd0YWN0aWMnOiAnRXhmaWx0cmF0aW9uJywgJ3VybCc6ICdodHRwczovL2F0dGFjay5taXRyZS5vcmcvdGVjaG5pcXVlcy9UMTA0MS8nLCAnZGVzY3JpcHRpb24nOiAnRGF0YSBleGZpbHRyYXRlZCBvdmVyIHRoZSBzYW1lIGNoYW5uZWwgdXNlZCBmb3IgQzIuJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTA0MScsICdldmlkZW5jZSc6ICdTdXN0YWluZWQgcGVyaW9kaWMgY29tbXVuaWNhdGlvbiAoMiw4NzIgZmxvd3MpIG92ZXIgYmVhY29uIGNoYW5uZWwgbWF5IGluZGljYXRlIGRhdGEgZXhmaWx0cmF0aW9uJ31dIg0KMTAuMC4zLjIwMOKGkjE5OC41MS4xMDAuOTksMTAuMC4zLjIwMOKGkjE5OC41MS4xMDAuOTksMTAuMC4zLjIwMCwxOTguNTEuMTAwLjk5LDExOSwwLjk1OTMsMjE2ODcuNCxUcnVlLFRydWUsMjE2ODcuMiwwLjAsVHJ1ZSwwLDAsMC4wLDAsMyxbXSwiWydjZG4uY2xvdWRmbGFyZS5jb20nLCAnZG5zLmdvb2dsZScsICdsb2dpbi5taWNyb3NvZnRvbmxpbmUuY29tJ10iLEZhbHNlLCwsLDAuMCxGYWxzZSxGYWxzZSxGYWxzZSxGYWxzZSxbXSxUcnVlLFRydWUsVHJ1ZSxUcnVlLFRydWUsRmFsc2UsVHJ1ZSxGYWxzZSxUcnVlLDAuNzUsMC4wLDAuNDM1LDAuNjc0LFRydWUsWydjZG4uYW5hbHl0aWNzLXBsYXRmb3JtLm5ldCddLFtdLFsnY2RuLmFuYWx5dGljcy1wbGF0Zm9ybS5uZXQnXSxbJ2U3ZDcwNWEzMjg2ZTE5ZWE0MmY1ODdiMzQ0ZWU2ODY1J10sIlt7J25hbWUnOiAnU2NoZWR1bGVkIFRyYW5zZmVyJywgJ3RhY3RpYyc6ICdFeGZpbHRyYXRpb24nLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxMDI5LycsICdkZXNjcmlwdGlvbic6ICdEYXRhIGV4ZmlsdHJhdGlvbiBhdCBzY2hlZHVsZWQgaW50ZXJ2YWxzIG1hdGNoaW5nIGJlYWNvbiB0aW1pbmcuJywgJ3RlY2huaXF1ZV9pZCc6ICdUMTAyOScsICdldmlkZW5jZSc6ICdTY2hlZHVsZWQgYmVhY29uIGludGVydmFsOiAyMTY4N3MgKGNvbmZpZGVuY2U6IDAuOTU5KSd9LCB7J25hbWUnOiAnQXBwbGljYXRpb24gTGF5ZXIgUHJvdG9jb2w6IEROUycsICd0YWN0aWMnOiAnQ29tbWFuZCBhbmQgQ29udHJvbCcsICd1cmwnOiAnaHR0cHM6Ly9hdHRhY2subWl0cmUub3JnL3RlY2huaXF1ZXMvVDEwNzEvMDA0LycsICdkZXNjcmlwdGlvbic6ICdDMiBjb21tdW5pY2F0aW9uIHR1bm5lbGVkIG92ZXIgRE5TIHF1ZXJpZXMgYW5kIHJlc3BvbnNlcy4nLCAndGVjaG5pcXVlX2lkJzogJ1QxMDcxLjAwNCcsICdldmlkZW5jZSc6ICdETlMgcXVlcnkgcGVyaW9kIG1hdGNoZXMgY29ubi1sb2cgYmVhY29uIHBlcmlvZCwgaW5kaWNhdGluZyBETlMtbGF5ZXIgQzIgY29tbXVuaWNhdGlvbid9LCB7J25hbWUnOiAnRW5jcnlwdGVkIENoYW5uZWwnLCAndGFjdGljJzogJ0NvbW1hbmQgYW5kIENvbnRyb2wnLCAndXJsJzogJ2h0dHBzOi8vYXR0YWNrLm1pdHJlLm9yZy90ZWNobmlxdWVzL1QxNTczLycsICdkZXNjcmlwdGlvbic6ICdDMiB0cmFmZmljIGVuY3J5cHRlZCB0byBwcmV2ZW50IGNvbnRlbnQgaW5zcGVjdGlvbi4nLCAndGVjaG5pcXVlX2lkJzogJ1QxNTczJywgJ2V2aWRlbmNlJzogJ0JlYWNvbiBjb25maXJtZWQgcGVyaW9kaWMgd2l0aCBubyBIVFRQIHBheWxvYWQgdmlzaWJpbGl0eSDigJQgbGlrZWx5IGVuY3J5cHRlZCBDMiBjaGFubmVsIChIVFRQUy9UTFMpJ31dIg0KMTAuMC4xLjUw4oaSMjAzLjAuMTEzLjEwLDEwLjAuMS41MOKGkjIwMy4wLjExMy4xMCwxMC4wLjEuNTAsMjAzLjAuMTEzLjEwLDg2MjYsMC45NTAxLDMwMC4zLFRydWUsRmFsc2UsMC4wLDEuMCxUcnVlLDEwLDI1NjMsMC4yODkyLDAsMywiWyducnBqNWhidnQ3anh6LmNvbScsICdyOTcxcW0zN3NoODA0LmNvbScsICcxMmJxZGdjNTQ3N216OC5jb20nLCAnbXZmaDhxZnIwcTZkOWsuY29tJywgJzV2Z2poODE2OG5jczloLmNvbScsICdkbjA5YmdzdzFqejQuY29tJywgJ2p3d3I1a3pxbmhjbDMuY29tJywgJ2xxcnkxN2p6am1uZnMuY29tJywgJzZ3YmdyMTA1ODJjdHQuY29tJywgJ2YzajVidzl6MG1ycTguY29tJ10iLCJbJ2Nkbi5jbG91ZGZsYXJlLmNvbScsICdkbnMuZ29vZ2xlJywgJ2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20nXSIsRmFsc2UsLCwsMC4wLEZhbHNlLEZhbHNlLEZhbHNlLEZhbHNlLFtdLFRydWUsRmFsc2UsVHJ1ZSxUcnVlLFRydWUsRmFsc2UsVHJ1ZSxUcnVlLFRydWUsMC42NSwwLjAsMC4zOSwwLjU2NixUcnVlLFtdLFtdLFtdLFsnZTdkNzA1YTMyODZlMTllYTQyZjU4N2IzNDRlZTY4NjUnXSwiW3snbmFtZSc6ICdTY2hlZHVsZWQgVHJhbnNmZXInLCAndGFjdGljJzogJ0V4ZmlsdHJhdGlvbicsICd1cmwnOiAnaHR0cHM6Ly9hdHRhY2subWl0cmUub3JnL3RlY2huaXF1ZXMvVDEwMjkvJywgJ2Rlc2NyaXB0aW9uJzogJ0RhdGEgZXhmaWx0cmF0aW9uIGF0IHNjaGVkdWxlZCBpbnRlcnZhbHMgbWF0Y2hpbmcgYmVhY29uIHRpbWluZy4nLCAndGVjaG5pcXVlX2lkJzogJ1QxMDI5JywgJ2V2aWRlbmNlJzogJ1NjaGVkdWxlZCBiZWFjb24gaW50ZXJ2YWw6IDMwMHMgKGNvbmZpZGVuY2U6IDAuOTUwKSd9LCB7J25hbWUnOiAnRHluYW1pYyBSZXNvbHV0aW9uOiBEb21haW4gR2VuZXJhdGlvbiBBbGdvcml0aG1zJywgJ3RhY3RpYyc6ICdDb21tYW5kIGFuZCBDb250cm9sJywgJ3VybCc6ICdodHRwczovL2F0dGFjay5taXRyZS5vcmcvdGVjaG5pcXVlcy9UMTU2OC8wMDIvJywgJ2Rlc2NyaXB0aW9uJzogJ0FsZ29yaXRobWljYWxseSBnZW5lcmF0ZWQgZG9tYWlucyBmb3IgQzIgcmVuZGV6dm91cy4nLCAndGVjaG5pcXVlX2lkJzogJ1QxNTY4LjAwMicsICdldmlkZW5jZSc6ICdER0EtZ2VuZXJhdGVkIGRvbWFpbnMgZGV0ZWN0ZWQ6IG5ycGo1aGJ2dDdqeHouY29tLCByOTcxcW0zN3NoODA0LmNvbSwgMTJicWRnYzU0NzdtejguY29tJ30sIHsnbmFtZSc6ICdFbmNyeXB0ZWQgQ2hhbm5lbCcsICd0YWN0aWMnOiAnQ29tbWFuZCBhbmQgQ29udHJvbCcsICd1cmwnOiAnaHR0cHM6Ly9hdHRhY2subWl0cmUub3JnL3RlY2huaXF1ZXMvVDE1NzMvJywgJ2Rlc2NyaXB0aW9uJzogJ0MyIHRyYWZmaWMgZW5jcnlwdGVkIHRvIHByZXZlbnQgY29udGVudCBpbnNwZWN0aW9uLicsICd0ZWNobmlxdWVfaWQnOiAnVDE1NzMnLCAnZXZpZGVuY2UnOiAnQmVhY29uIGNvbmZpcm1lZCBwZXJpb2RpYyB3aXRoIG5vIEhUVFAgcGF5bG9hZCB2aXNpYmlsaXR5IOKAlCBsaWtlbHkgZW5jcnlwdGVkIEMyIGNoYW5uZWwgKEhUVFBTL1RMUyknfSwgeyduYW1lJzogJ0V4ZmlsdHJhdGlvbiBPdmVyIEMyIENoYW5uZWwnLCAndGFjdGljJzogJ0V4ZmlsdHJhdGlvbicsICd1cmwnOiAnaHR0cHM6Ly9hdHRhY2subWl0cmUub3JnL3RlY2huaXF1ZXMvVDEwNDEvJywgJ2Rlc2NyaXB0aW9uJzogJ0RhdGEgZXhmaWx0cmF0ZWQgb3ZlciB0aGUgc2FtZSBjaGFubmVsIHVzZWQgZm9yIEMyLicsICd0ZWNobmlxdWVfaWQnOiAnVDEwNDEnLCAnZXZpZGVuY2UnOiAnU3VzdGFpbmVkIHBlcmlvZGljIGNvbW11bmljYXRpb24gKDgsNjI2IGZsb3dzKSBvdmVyIGJlYWNvbiBjaGFubmVsIG1heSBpbmRpY2F0ZSBkYXRhIGV4ZmlsdHJhdGlvbid9XSINCjEwLjAuMS4zMOKGkjIxNi4yMzkuMzUuMCwxMC4wLjEuMzDihpIyMTYuMjM5LjM1LjAsMTAuMC4xLjMwLDIxNi4yMzkuMzUuMCwyNTI2LDAuOTc0OCwxMDI2LjAsVHJ1ZSxGYWxzZSwwLjAsMS4wLFRydWUsMCwwLDAuMCwwLDMsW10sIlsnY2RuLmNsb3VkZmxhcmUuY29tJywgJ2Rucy5nb29nbGUnLCAnbG9naW4ubWljcm9zb2Z0b25saW5lLmNvbSddIixGYWxzZSwsLCwwLjAsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsW10sRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsMC40LDAuMCwwLjAsMC41Mzc1LEZhbHNlLFtdLFtdLFtdLFtdLFtdDQoxMC4wLjEuMjDihpIxMy4xMDcuNC41MCwxMC4wLjEuMjDihpIxMy4xMDcuNC41MCwxMC4wLjEuMjAsMTMuMTA3LjQuNTAsNzI2LDAuODk5NCwzNTkyLjAsVHJ1ZSxGYWxzZSwwLjAsMS4wLFRydWUsMCwwLDAuMCwwLDMsW10sIlsnY2RuLmNsb3VkZmxhcmUuY29tJywgJ2Rucy5nb29nbGUnLCAnbG9naW4ubWljcm9zb2Z0b25saW5lLmNvbSddIixGYWxzZSwsLCwwLjAsRmFsc2UsRmFsc2UsRmFsc2UsRmFsc2UsW10sVHJ1ZSxUcnVlLFRydWUsVHJ1ZSxGYWxzZSxGYWxzZSxGYWxzZSxGYWxzZSxGYWxzZSwwLjQsMC4wLDAuMywwLjM5LEZhbHNlLFtdLFtdLFsnd2luZG93c3VwZGF0ZS5taWNyb3NvZnQuY29tJ10sWydhYTlmMGQ3Y2Q3OGM4ZTQ1NWIwM2JiMzk5ODVhMDBhOCddLFtdDQo=" download="corroboration.csv">⬇ Corroboration Results</a>
+<a class="csv-btn" href="data:text/csv;base64,c2F4X3dvcmQsc2F4X3N5bWJvbF9jdixzYXhfYWNmX3BlYWssc2F4X21vdGlmX2ZyYWN0aW9uLHNheF9wYXNzZXMsbl9vYnNlcnZhdGlvbnMsY2hhbm5lbF9pZCxwYWlyX2lkLHNyY19pcCxkc3RfaXAsc2F4X3ByZXNjcmVlbl9wYXNzDQpjY2NiYmJiY2NiY2NiYmJiYmNiYiwwLjM0OTksMC41ODMzLDAuNSxUcnVlLDg2MjYsMTAuMC4xLjUw4oaSMjAzLjAuMTEzLjEwLDEwLjAuMS41MOKGkjIwMy4wLjExMy4xMCwxMC4wLjEuNTAsMjAzLjAuMTEzLjEwLFRydWUNCmJjY2NjYmNiY2JjYmNiYmJiYmJiLDAuMzQ5OSwwLjY2NjcsMC41LFRydWUsMjg3MiwxMC4wLjIuMTAw4oaSMjAzLjAuMTEzLjU1LDEwLjAuMi4xMDDihpIyMDMuMC4xMTMuNTUsMTAuMC4yLjEwMCwyMDMuMC4xMTMuNTUsVHJ1ZQ0KY2NiY2NiYmJiY2JjYmJjYmNjY2MsMC4zMjEsMC40Njc0LDAuNSxUcnVlLDI1MjYsMTAuMC4xLjMw4oaSMjE2LjIzOS4zNS4wLDEwLjAuMS4zMOKGkjIxNi4yMzkuMzUuMCwxMC4wLjEuMzAsMjE2LjIzOS4zNS4wLFRydWUNCmJjYmNjY2NjYmJiYmNjYmJjYmNjLDAuMzIxLDAuNDE0MSwwLjUsVHJ1ZSw3MjYsMTAuMC4xLjIw4oaSMTMuMTA3LjQuNTAsMTAuMC4xLjIw4oaSMTMuMTA3LjQuNTAsMTAuMC4xLjIwLDEzLjEwNy40LjUwLFRydWUNCmJjYmNjYmJjY2JiY2JjYmNiYmJiLDAuMzQ5OSwwLjI5ODIsMC42LFRydWUsNzIwLDEwLjAuMS43NeKGkjE5OC41MS4xMDAuMjAsMTAuMC4xLjc14oaSMTk4LjUxLjEwMC4yMCwxMC4wLjEuNzUsMTk4LjUxLjEwMC4yMCxUcnVlDQpjYmJiZGNjYmNiYmJjYmJiY2RjYiwwLjQzMTYsMC40OTM5LDAuNixUcnVlLDExOSwxMC4wLjMuMjAw4oaSMTk4LjUxLjEwMC45OSwxMC4wLjMuMjAw4oaSMTk4LjUxLjEwMC45OSwxMC4wLjMuMjAwLDE5OC41MS4xMDAuOTksVHJ1ZQ0KY2FiYmJiYWRkY2NhLDAuNzcwNiwwLjU3ODksMC41LFRydWUsMTQsMTAuMC4xLjE2MeKGkjUyLjE5NS4yMDguMTQsMTAuMC4xLjE2MeKGkjUyLjE5NS4yMDguMTQsMTAuMC4xLjE2MSw1Mi4xOTUuMjA4LjE0LFRydWUNCg==" download="sax_screening.csv">⬇ SAX Pre-Screening</a>
+</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">📊 Diagnostic Plots (0 figures)</div>
+    <div class="section-body"><div class="gallery"></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">ℹ Run Metadata</div>
+    <div class="section-body"><table class="mtable"><tr><td class="mkey">Run start</td><td class="mval">2026-03-20 00:57:46 UTC</td></tr><tr><td class="mkey">Run end</td><td class="mval">2026-03-20 00:58:59 UTC</td></tr><tr><td class="mkey">Duration</td><td class="mval">0:01:12</td></tr><tr><td class="mkey">Conn rows</td><td class="mval">945,589</td></tr><tr><td class="mkey">Pre-filtered</td><td class="mval">2,351</td></tr><tr><td class="mkey">Anomalies</td><td class="mval">15,603</td></tr><tr><td class="mkey">Channels evaluated</td><td class="mval">7</td></tr><tr><td class="mkey">SAX pass</td><td class="mval">7</td></tr><tr><td class="mkey">Beacon channels</td><td class="mval">6</td></tr><tr><td class="mkey">Corroborated</td><td class="mval">4</td></tr></table></div>
+  </div>
+
+</div>
+
+<div class="modal" id="modal" onclick="closeModal()">
+  <span class="modal-close" onclick="closeModal()">✕</span>
+  <div class="modal-title" id="modal-title"></div>
+  <img id="modal-img" src="" alt="">
+</div>
+
+<script>
+  function openModal(src,title){
+    document.getElementById('modal-img').src=src;
+    document.getElementById('modal-title').textContent=title;
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeModal(){document.getElementById('modal').classList.remove('open')}
+  function scrollToLead(rank){
+    const el=document.getElementById('lead-'+rank);
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+</script>
+</body>
+</html>
