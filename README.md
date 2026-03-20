@@ -18,7 +18,7 @@ CADENCE is built around that observation. It doesn't look for a single anomalous
 Each stage answers a specific question that the previous stage cannot:
 
 ```
-Zeek conn.log  (30 days, ~30k rows/day)
+Zeek conn.log, zeek.http, zeek.dns, zeek.ssl  (30 days, ~30k rows/day)
       │
       ▼
 ┌─────────────────────────────────────────────────────────────────┐
