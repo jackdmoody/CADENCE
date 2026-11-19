@@ -227,10 +227,12 @@ Under the earlier scenario-level rule the same runs score F1 \OldEvalF{} on seed
 \begin{table}[tbp]
 \centering\scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Real-data results, default configuration, strict view. $n_{C2}$: C2 pairs present in the connection data. Beacon and lead are the Stage~6 and Stage~9 operating points. AP: average precision. Last column: the stage where most missed C2 pairs stopped.}\label{tab:real}
-\begin{tabular}{@{}llrrrrrrl@{}}
+\caption{Real-data results, default configuration, strict view. $n_{C2}$: C2 pairs in the connection data. Beacon: Stage~6 operating point on the conn-only run. Lead: Stage~9 on the run with DNS/HTTP/TLS logs (for CTU-13 an ablation, see Sect.~\ref{sec:setup}), with default H2 and with the opt-in 5\,s linking. AP: average precision. Last column: where most missed C2 pairs stopped.}\label{tab:real}
+\begin{tabular}{@{}llrrrrrrrrl@{}}
 \toprule
-Run & Family & $n_{C2}$ & P$_{\text{beacon}}$ & R$_{\text{beacon}}$ & P$_{\text{lead}}$ & R$_{\text{lead}}$ & AP & Most misses at\\
+& & & \multicolumn{2}{c}{Beacon} & \multicolumn{2}{c}{Lead} & \multicolumn{2}{c}{Lead, linked H2} & & \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Run & Family & $n_{C2}$ & P & R & P & R & P & R & AP & Most misses at\\
 \midrule
 \RealRows
 \bottomrule

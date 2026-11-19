@@ -209,41 +209,73 @@ def synthetic(out: list[str]) -> None:
         out.append(cmd(f"ExfilConf{tag}", pm(conf) if conf else r"\TBD"))
 
 
+def _variant(name: str) -> tuple[str, str]:
+    """Split a run folder name into (base, variant): connonly, full, h2link or main."""
+    for suf, var in (("_full_h2link", "h2link"), ("_h2link", "h2link"), ("_connonly", "connonly"), ("_full", "full")):
+        if name.endswith(suf):
+            return name[: -len(suf)], var
+    return name, "main"
+
+
+def _top_miss(m: dict, beacon_is_detection: bool) -> str:
+    stages = m.get("c2_pairs_by_stage", {})
+    detected = ("corroborated", "beacon_uncorroborated") if beacon_is_detection else ("corroborated",)
+    k, v = max(((k, v) for k, v in stages.items() if k not in detected), key=lambda kv: kv[1], default=("none", 0))
+    return f"{k.replace('_', ' ')} ({v})" if v else "none"
+
+
 def real(out: list[str]) -> None:
-    rows, prow = [], []
+    """One table row per dataset/scenario; conn-only, full and H2-linked runs side by side."""
     runs = sorted(p for p in REAL.glob("*") if (p / "metrics.json").exists()) if REAL.exists() else []
+    groups: dict[str, dict[str, Path]] = {}
     for d in runs:
-        m = json.loads((d / "metrics.json").read_text())
-        info = json.loads((d / "dataset_info.json").read_text()) if (d / "dataset_info.json").exists() else {}
-        s = m["strict"]
-        name = d.name.replace("_", r"\_")
-        fam = info.get("malware_family", "")
-        b, c = s["beacon_stage"], s["corroborated_stage"]
-        stages = m.get("c2_pairs_by_stage", {})
-        detected = ("corroborated", "beacon_uncorroborated") if "connonly" in d.name else ("corroborated",)
-        top_miss = max(((k, v) for k, v in stages.items() if k not in detected),
-                       key=lambda kv: kv[1], default=("none", 0))
-        rows.append(
-            f"\\texttt{{{name}}} & {fam} & {m['n_gt_c2_pairs_in_conn']} & "
-            f"{fmt(b['precision'])} & {fmt(b['recall'])} & "
-            + ("-- & -- & " if "connonly" in d.name else f"{fmt(c['precision'])} & {fmt(c['recall'])} & ")
-            + f"{fmt(s.get('average_precision'))} & "
-            + (f"{top_miss[0].replace('_', ' ')} ({top_miss[1]})" if top_miss[1] else "none") + " \\\\")
-        gp = d / "gt_periodicity.csv"
+        base, var = _variant(d.name)
+        groups.setdefault(base, {})[var] = d
+
+    rows, prow = [], []
+    for base, g in groups.items():
+        def load(var):
+            d = g.get(var)
+            if d is None:
+                return None, {}
+            info = json.loads((d / "dataset_info.json").read_text()) if (d / "dataset_info.json").exists() else {}
+            return json.loads((d / "metrics.json").read_text()), info
+        m_c, i_c = load("connonly")
+        m_f, i_f = load("full")
+        m_m, i_m = load("main")
+        m_h, _ = load("h2link")
+        beacon_src = m_c or m_m or m_f            # timing view: conn-only if present
+        lead_src = m_f or m_m                     # corroboration view
+        info = i_c or i_m or i_f
+        fam = info.get("malware_family") or ""
+        n = (beacon_src or lead_src)["n_gt_c2_pairs_in_conn"]
+        bs = beacon_src["strict"]["beacon_stage"]
+        def lead(m):
+            if not m:
+                return "-- & --"
+            c = m["strict"]["corroborated_stage"]
+            return f"{fmt(c['precision'])} & {fmt(c['recall'])}"
+        label = base.replace("_", r"\_")
+        rows.append(f"\\texttt{{{label}}} & {fam} & {n} & {fmt(bs['precision'])} & {fmt(bs['recall'])} & "
+                    f"{lead(lead_src)} & {lead(m_h)} & {fmt(beacon_src['strict'].get('average_precision'))} & "
+                    f"{_top_miss(beacon_src, beacon_is_detection=m_c is not None)} \\\\")
+        # Published vs estimated period (lab captures)
+        main_dir = g.get("main") or g.get("connonly") or g.get("full")
         pub = info.get("published_period_s")
-        if pub and gp.exists():
-            g = pd.read_csv(gp)
-            if not g.empty and "dominant_period_s" in g:
-                est = g["dominant_period_s"].iloc[0]
-                conf = g["beacon_confidence"].iloc[0] if "beacon_confidence" in g else None
+        gp = main_dir / "gt_periodicity.csv" if main_dir else None
+        if pub and gp is not None and gp.exists():
+            gdf = pd.read_csv(gp)
+            if not gdf.empty and "dominant_period_s" in gdf:
+                est = gdf["dominant_period_s"].iloc[0]
+                conf = gdf["beacon_confidence"].iloc[0] if "beacon_confidence" in gdf else None
                 jit = info.get("published_jitter", "")
                 if isinstance(jit, (int, float)):
                     jit = f"{jit * 100:.0f}\\%" if jit <= 1 else f"{jit:.0f}\\%"
                 else:
                     jit = str(jit or "--").replace("%", "\\%")
-                prow.append(f"\\texttt{{{name}}} & {period_str(pub)} & {jit} & {period_str(est)} & {fmt(conf)} \\\\")
+                prow.append(f"\\texttt{{{label}}} & {period_str(pub)} & {jit} & {period_str(est)} & {fmt(conf)} \\\\")
     if not rows:
-        rows = [r"\multicolumn{9}{c}{\textit{Real-data runs pending}} \\"]
+        rows = [r"\multicolumn{11}{c}{\textit{Real-data runs pending}} \\"]
     (GEN / "real_table.tex").write_text("\n".join(rows) + "\n")
     (GEN / "real_periods.tex").write_text("\n".join(prow) + "\n" if prow else "")
     out.append("\\newcommand{\\RealRows}{%\n" + "\n".join(rows) + "}\n")
@@ -256,6 +288,7 @@ def real(out: list[str]) -> None:
     else:
         out.append("\\newcommand{\\RealPeriodTable}{}\n")
     out.append(cmd("RealRuns", len(runs)))
+    out.append(cmd("RealDatasets", len(groups)))
 
 
 def main() -> None:
