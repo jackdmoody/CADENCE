@@ -39,9 +39,9 @@ Files: `related/opcua_reanalysis/`. The script reproduces Lo et al.'s Isolation 
 6. 3 Sep multi-stage run: per-minute and per-stage detection for every detector, plus time to first detection per stage.
 7. Write `related/opcua_reanalysis/FINDINGS.md`. It needs a headline table, the three protocol issues with evidence, the clean-protocol results, the attack-path split, the oracle bound, the 3 Sep run, and one short paragraph on what it motivates. That paragraph covers value-aware, consequence-weighted detection and IT/OT fusion, where an OPC UA write detector is one noisy sensor alongside CADENCE (Zeek) and DRIFT (endpoint ATT&CK transitions). Keep the tone factual and collegial, not a rebuttal. Do not draft any email or outreach.
 
-### 2. Synthetic baseline under the new scorer
+### 2. Synthetic baseline (skip)
 
-The old evaluator in `generate_synthetic_data.evaluate_detection` credits a detection when either the source or the destination matches a malicious scenario, counts true positives per scenario and false positives per pair. Run the default 30-day synthetic set through `run_real_data.py --cadence-dir` with pair-level ground truth (malicious pairs from the generator's `label` column, as in `test_real_data.py`). Report both numbers side by side. Do not change the old evaluator.
+The main session is re-running the synthetic evaluation and writing the paper. Do not duplicate it. Do not create or edit anything under `paper/`.
 
 ### 3. CTU-13 (main event)
 
@@ -69,7 +69,6 @@ Use per-scenario `conn.log.labeled` files (the logs-only release). Pick 2–3 ma
 - what ran and what did not, and why;
 - one table per dataset with conn-only and full numbers, beacon and corroborated stages, strict and lenient, and AP;
 - C2 pairs by stage (miss attribution);
-- the synthetic old-vs-new comparison;
 - every non-default setting and why;
 - bugs fixed;
 - exact commands to reproduce;
