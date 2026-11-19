@@ -84,7 +84,7 @@ Figure~\ref{fig:pipeline} shows the ten stages. Defaults are given in parenthese
 \begin{tikzpicture}[
   node distance=2.0mm and 2.5mm,
   st/.style={draw,rounded corners=1.5pt,minimum height=7.5mm,text width=18mm,align=center,font=\scriptsize,fill=gray!8},
-  ev/.style={st,fill=blue!6},
+  ev/.style={st,fill=blue!6,text width=23mm},
   ar/.style={-{Stealth[length=1.6mm]},thick}]
 \node[st] (a) {1--2 Ingest \&\\channel features};
 \node[st,right=of a] (b) {3 Domain\\pre-filter};
@@ -93,7 +93,7 @@ Figure~\ref{fig:pipeline} shows the ten stages. Defaults are given in parenthese
 \node[st,below=4mm of d] (e) {6 Binned ACF +\\Welch PSD};
 \node[st,left=of e] (f) {7 Priority\\scoring};
 \node[st,left=of f] (g) {8 PELT\\changepoints};
-\node[ev,left=of g] (h) {9 DNS/HTTP/TLS\\corroboration};
+\node[ev,left=of g] (h) {9 Corroboration\\(DNS/HTTP/TLS)};
 \node[st,below=4mm of h,fill=orange!10] (i) {10 ATT\&CK\\annotation};
 \node[st,right=of i,text width=48mm,fill=red!6] (j) {Analyst brief: period, confidence, H1--H6 evidence, start time, techniques};
 \draw[ar] (a)--(b); \draw[ar] (b)--(c); \draw[ar] (c)--(d); \draw[ar] (d)--(e);
