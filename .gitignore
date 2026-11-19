@@ -13,3 +13,7 @@ paper/*.fdb_latexmk
 paper/*.fls
 paper/*.log
 paper/*.out
+
+# Python bytecode
+__pycache__/
+*.pyc
