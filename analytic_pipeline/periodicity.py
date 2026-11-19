@@ -174,28 +174,52 @@ def _acf_dominant_peak(
 
 
 def _fft_dominant_period(
-    iat: np.ndarray,
+    timestamps: np.ndarray,
     min_period_s: float,
 ) -> tuple[float, float]:
-    """Return (dominant_period_s, power_ratio) from Welch PSD of IAT sequence."""
-    n = len(iat)
-    if n < 8:
+    """
+    Return (dominant_period_s, power_ratio) from the Welch PSD of the binned
+    connection-count series.
+
+    The series uses the same bins as _binned_count_acf (width = median IAT / 2)
+    and is sampled at fs = 1 / bin_size, so frequencies are in Hz and periods
+    in seconds. power_ratio is the share of power, over periods
+    >= min_period_s and excluding DC, that falls in the peak frequency bin.
+
+    Fix (v3.1): earlier versions ran Welch on the IAT *sequence* with fs=1.0,
+    so "periods" were counted in beacons, not seconds. Every pair with >= 60
+    observations then returned (64.0, 1.0) regardless of its timing, and the
+    spectral term carried no information.
+    """
+    ts = np.asarray(timestamps, dtype=float)
+    if len(ts) < 8:
+        return 0.0, 0.0
+    iat = np.diff(ts)
+    iat = iat[iat > 0]
+    if len(iat) < 4:
         return 0.0, 0.0
 
-    nperseg    = min(n, 64)
-    freqs, psd = signal.welch(iat, fs=1.0, nperseg=nperseg)
+    bin_size = max(float(np.median(iat)) / 2.0, 1.0)
+    bins = np.arange(ts[0], ts[-1] + bin_size, bin_size)
+    counts, _ = np.histogram(ts, bins=bins)
+    if len(counts) < 8:
+        return 0.0, 0.0
+
+    x = counts.astype(float) - counts.mean()
+    nperseg    = min(len(x), 64)
+    freqs, psd = signal.welch(x, fs=1.0 / bin_size, nperseg=nperseg)
 
     with np.errstate(divide="ignore", invalid="ignore"):
         periods = np.where(freqs > 0, 1.0 / freqs, 0.0)
 
     valid = (freqs > 0) & (periods >= min_period_s)
-    if not valid.any():
+    if not valid.any() or psd[valid].sum() <= 0:
         return 0.0, 0.0
 
     psd_valid     = psd[valid]
     periods_valid = periods[valid]
     dominant_idx  = int(np.argmax(psd_valid))
-    power_ratio   = float(psd_valid[dominant_idx] / (psd[valid].sum() + 1e-12))
+    power_ratio   = float(psd_valid[dominant_idx] / (psd_valid.sum() + 1e-12))
     return float(periods_valid[dominant_idx]), power_ratio
 
 
@@ -257,7 +281,7 @@ def score_pair_periodicity(
     iat_median   = float(np.median(iat))
     acf_period_s = float(acf_lag * iat_median / 2.0) if acf_lag > 0 else 0.0
 
-    fft_period_s, fft_power_ratio = _fft_dominant_period(iat, pc.min_period_s)
+    fft_period_s, fft_power_ratio = _fft_dominant_period(ts_sorted, pc.min_period_s)
 
     # Prefer ACF period when available; FFT on raw IAT is unreliable for jittered beacons
     dominant_period_s = acf_period_s if acf_period_s >= pc.min_period_s else fft_period_s

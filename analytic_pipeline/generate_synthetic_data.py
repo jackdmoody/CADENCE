@@ -60,6 +60,7 @@ Usage
 from __future__ import annotations
 
 import argparse
+import zlib
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -814,7 +815,9 @@ class SyntheticDataGenerator:
         # --- Scenario traffic ---
         label_rows = []
         for scenario in self.scenarios:
-            s_rng       = np.random.default_rng(self.seed + hash(scenario.name) % (2**31))
+            # zlib.crc32, not hash(): str hashes are salted per process (PYTHONHASHSEED),
+            # which made the same seed produce different data on every run.
+            s_rng       = np.random.default_rng(self.seed + zlib.crc32(scenario.name.encode()) % (2**31))
             timestamps  = _beacon_timestamps(scenario, start_ts, end_ts, s_rng)
             n_firings   = len(timestamps)
 

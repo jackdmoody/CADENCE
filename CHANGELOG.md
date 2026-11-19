@@ -15,6 +15,9 @@ All notable changes to CADENCE are documented here.
 - **`test_real_data.py`** — Adapter, prefilter, ground-truth and scoring tests, plus a round trip asserting that synthetic data written as native Zeek logs produces stage-for-stage identical results to the direct CSV path.
 
 ### Fixed
+- **Spectral confirmation carried no information** — `_fft_dominant_period` ran Welch on the IAT *sequence* with `fs=1.0`, so its periods were counted in beacons, not seconds. Against the 60 s floor, every pair with ≥ 60 observations returned period 64 and power ratio 1.0 (periodic or not), and pairs with fewer returned 0. It now runs on the same binned count series as the ACF, sampled at `1/bin_size`. Beacons with up to ~30% jitter score 0.15–0.67 at the right period; Poisson, uniform and bursty traffic score 0.04–0.06. Slow beacons with few observations now get spectral evidence instead of zero. Regression tests in `test_spectral.py`.
+- **Synthetic data depended on PYTHONHASHSEED** — per-scenario RNGs were seeded with `hash(scenario.name)`, which Python salts per process, so the same seed gave different data on each run. Now seeded with `zlib.crc32`. This was the cause of the intermittent `test_priority_score_monotone_with_beacon_confidence` failure.
+- `test_priority_score_monotone_with_beacon_confidence` now checks that confirmed beacons outrank non-beacons; the old top-5-vs-median form failed on near-ties when nearly every scored channel is a beacon.
 - README real-data export tips described a `zeek-cut` workflow whose native column names the loader does not read. Replaced with the adapter workflow.
 
 ---

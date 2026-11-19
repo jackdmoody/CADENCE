@@ -398,14 +398,21 @@ class TestPipelineIntegration:
         assert len(fp_srcs) == 0, f"Decoy sources corroborated: {fp_srcs}"
 
     def test_priority_score_monotone_with_beacon_confidence(self, pipeline_artifacts):
-        """Channels with higher beacon_confidence should generally rank higher."""
+        """Channels confirmed as beacons should rank at or above channels that are not.
+
+        The earlier form (top-5 mean confidence >= median) failed on near-ties
+        whenever almost every scored channel was a genuine beacon, which is the
+        normal case on this small synthetic set.
+        """
         art, _, _ = pipeline_artifacts
         if art.priority.empty or len(art.priority) < 2:
             return
-        # Top 5 by priority should all have higher beacon_confidence than median
-        top5     = art.priority.head(5)["beacon_confidence"].mean()
-        med_conf = art.priority["beacon_confidence"].median()
-        assert top5 >= med_conf, "Top-priority channels have lower beacon confidence than median"
+        thr = BDPConfig().periodicity.confidence_threshold
+        beacon = art.priority[art.priority["beacon_confidence"] >= thr]["priority_score"]
+        other  = art.priority[art.priority["beacon_confidence"] < thr]["priority_score"]
+        if beacon.empty or other.empty:
+            return
+        assert beacon.min() >= other.max(), "A non-beacon channel outranks a confirmed beacon"
 
 
 # ---------------------------------------------------------------------------
