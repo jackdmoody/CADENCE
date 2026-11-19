@@ -1,0 +1,227 @@
+
+====================================================================================================
+A. DOES A WRITTEN-VALUE FIELD EXIST?  (every column of every released CSV; the repo's Step 1-4 scripts)
+====================================================================================================
+  opcua_instance1-60_sliced_1min.csv: 662,194 rows, columns = ['instance', 'scenario', 'ts', 'uid', 'id.orig_h', 'id.orig_p', 'id.resp_h', 'id.resp_p', 'is_orig', 'opcua_link_id', 'is_final', 'msg_size', 'identifier', 'node_id_string', 'is_sp_write', 'is_output_write']
+  20250903_Network_OPCUA_enriched_features_instanced_file1.csv + 20250903_Network_OPCUA_enriched_features_instanced_file2.csv: 1,106,490 rows, columns = ['ts', 'uid', 'id.orig_h', 'id.orig_p', 'id.resp_h', 'id.resp_p', 'is_orig', 'opcua_link_id', 'is_final', 'msg_size', 'identifier', 'node_id_string', 'ts_uk', 'instance', 'is_sp_write', 'is_output_write']
+
+  Setpoint WriteRequests in the 60-instance file: per column, distinct values (overall / within one client)
+    instance           54   per client {'192.168.1.16': 24, '192.168.1.36': 30}
+    scenario            6   per client {'192.168.1.16': 6, '192.168.1.36': 5}
+    ts                167   per client {'192.168.1.16': 67, '192.168.1.36': 100}
+    uid                54   per client {'192.168.1.16': 24, '192.168.1.36': 30}
+    id.orig_h           2   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+    id.orig_p           5   per client {'192.168.1.16': 3, '192.168.1.36': 2}
+    id.resp_h           1   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+    id.resp_p           1   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+    is_orig             1   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+    opcua_link_id     167   per client {'192.168.1.16': 67, '192.168.1.36': 100}
+    is_final            1   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+    msg_size            2   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+    identifier          1   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+    node_id_string      1   per client {'192.168.1.16': 1, '192.168.1.36': 1}
+
+  msg_size of setpoint writes, by scenario and client (scenarios command different speeds):
+    id.orig_h      192.168.1.16 192.168.1.36
+    scenario                                
+    Normal_Speed          [165]          NaN
+    Oscillate             [165]        [161]
+    Speed_TooFast         [165]        [161]
+    Speed_TooSlow         [165]        [161]
+    VariousThreats        [165]        [161]
+    WrongDirection        [165]        [161]
+    -> one size per client in every scenario (165 HMI, 161 UA Expert) whether the commanded speed is 4-6, 8-10, 0-3
+       or negative, so msg_size reflects the client's encoding, not the value. No column carries the value.
+
+  Extraction scripts (data/FactoryIOOPCUA/scripts):
+    scripts/Step 1 Convert pcapng to Zeek Logs/extractZeekLogsEnhanced.sh
+       | ZEEK_SCRIPT="icsnpp/opcua-binary"
+       | zeek -Cr "$PCAP_FILE" "$ZEEK_SCRIPT" > /dev/null 2>&1
+    scripts/Step 2 Extract Zeek Logs to CSV/extractlogtoCSV_enriched_inference.py
+       | write_log = instance_path / "opcua_binary_write.log"
+       | df_write = extract_log_df(write_log)[['opcua_link_id', 'node_id_string', 'req_status_code_link_id']]
+    scripts/Step 3 Extract Features from CSV/extract_opcua_features_enriched.py
+       | selected_columns = [
+       | raise ValueError(f"Missing columns in {csv_file.name}: {missing_cols}")
+       | raise ValueError(f"Could not find instance number in {csv_file.name}")
+    scripts/Step 3 Extract Features from CSV/extract_opcua_features_enriched_inference.py
+       | selected_columns = [
+       | raise ValueError(f"Missing columns in input file: {missing}")
+    scripts/Step 4 Slice to 1-minute intervals/extract_1minute.py
+       | instance_data = instance_data.sort_values('ts')
+    scripts/Step 4 Slice to 1-minute intervals/extract_1minute_inference.py
+    -> Step 1 runs Zeek with the full icsnpp/opcua-binary analyzer, which writes several opcua_binary_*.log files.
+       Step 2 joins opcua_binary.log to opcua_binary_write.log keeping only opcua_link_id, node_id_string and
+       req_status_code_link_id; Step 3 then drops req_status_code_link_id. Nothing value-related survives into the
+       released CSVs. Whether the values are in the authors' unreleased Zeek logs depends on the ICSNPP version used;
+       the raw pcaps would settle it.
+
+====================================================================================================
+B. THE THREE PROTOCOL ISSUES
+====================================================================================================
+  (1) Training normals are scored. Instances 1-10 train the model and are 10 of the 60 evaluated.
+      With contamination=c, IsolationForest sets its threshold at the c-quantile of its own training scores,
+      so about c*10 of those same normals are flagged by construction (c=0.2 -> 2 FPs).
+      contamination 0.1: FP count on the 10 training normals over 200 seeds = {1: 200}
+      contamination 0.2: FP count on the 10 training normals over 200 seeds = {2: 200}
+      contamination 0.3: FP count on the 10 training normals over 200 seeds = {2: 22, 3: 178}
+      contamination 0.4: FP count on the 10 training normals over 200 seeds = {2: 22, 3: 44, 4: 134}
+
+  (2) 'Normal' message size is the mode over all 60 runs, attacks included: 161 bytes.
+                                        setpoint_writes  sizes
+      client       in_training_normals                        
+      192.168.1.16 False                             63  [165]
+                   True                               4  [165]
+      192.168.1.36 False                            100  [161]
+      Mode over training normals only: 165 bytes. The all-runs mode (161) is the UA Expert client's size,
+      a client that appears only in attack runs, so 'size deviation' flags the trusted HMI's writes, including
+      the four in training normals 6, 8, 9, 10. With the training-only mode it flags UA Expert writes instead.
+      3 Sep run: setpoint writes per client {'192.168.1.16': 7, '192.168.1.36': 7}; mode computed on that run alone = 161 (a 7-7 tie, broken by pandas' sort order).
+
+  (3) Contamination chosen by F1 on the evaluation set. Notebook cell 41: 'contamination = 0.4 is chosen as it is
+      an optimal value based on F1-score on the evaluation set'; the saved/reported model uses 0.2.
+      c=0.05  TP  0/50  FP  1/10  F1 0.000
+      c=0.1   TP  0/50  FP  1/10  F1 0.000
+      c=0.15  TP 16/50  FP  2/10  F1 0.471
+      c=0.2   TP 48/50  FP  2/10  F1 0.960
+      c=0.25  TP 50/50  FP  3/10  F1 0.971
+      c=0.4   TP 50/50  FP  3/10  F1 0.971
+      The usable range (F1 > 0) begins at c=0.15; anything below gives recall 0. The choice needs attack labels.
+
+====================================================================================================
+C. CLEAN PROTOCOL  (LOO over 10 normals; mode from training normals only; 200 seeds)
+====================================================================================================
+  Each normal is scored only by the model trained on the other 9. Attacks are scored by all 10 fold models
+  (recall = mean over folds). Contamination: 'auto' (sklearn default, fixed a priori), or chosen per fold by
+  an FP budget from an inner LOO over that fold's 9 training normals: largest c in [0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
+  with at most b of 9 inner held-out normals alarmed. c=0.2 is shown for reference only (it was picked on
+  evaluation F1). Rules are rebuilt per fold from the 9 training normals.
+  contamination selected under budget 0/9 (all folds x seeds): {0.01: 642, 0.05: 14, 0.1: 888, 0.2: 54, 0.25: 402}
+  contamination selected under budget 1/9 (all folds x seeds): {0.01: 600, 0.05: 1, 0.1: 199, 0.2: 78, 0.25: 1122}
+
+  Seed-averaged expected counts; 95% CIs: exact Clopper-Pearson for FPR (n=10) and recall (n=50) at the rounded
+  count; stratified instance bootstrap (5000) for F1. With 10 normals an FPR CI is necessarily wide
+  (0/10 -> [0.00, 0.31]; 2/10 -> [0.03, 0.56]).
+
+  detector                                                          FP/10     FPR 95% CI  recall  recall 95% CI   prec     F1      F1 95% CI
+  Paper protocol: IF c=0.2 (train=test normals, all-runs mode)       2.00 [0.03, 0.56]   0.949 [0.83, 0.99]  0.960  0.954 [0.92, 0.98]
+  Clean: IF auto                                                     4.81 [0.19, 0.81]   0.984 [0.89, 1.00]  0.911  0.946 [0.92, 0.97]
+  Clean: IF c=0.2 (ref)                                              0.63 [0.00, 0.45]   0.887 [0.76, 0.95]  0.986  0.934 [0.90, 0.96]
+  Clean: IF budget 0/9                                               0.00 [0.00, 0.31]   0.317 [0.20, 0.47]  1.000  0.481 [0.45, 0.52]
+  Clean: IF budget 1/9                                               0.00 [0.00, 0.31]   0.661 [0.51, 0.79]  1.000  0.796 [0.77, 0.81]
+  Clean: Any setpoint write                                          4.00 [0.12, 0.74]   1.000 [0.93, 1.00]  0.926  0.962 [0.93, 0.99]
+  Clean: New client                                                  0.00 [0.00, 0.31]   0.600 [0.45, 0.74]  1.000  0.750 [0.63, 0.84]
+  Clean: Writes > train max OR new client                            0.00 [0.00, 0.31]   0.820 [0.69, 0.91]  1.000  0.901 [0.82, 0.96]
+  Clean: New setpoint writer (post hoc)                              0.00 [0.00, 0.31]   0.600 [0.45, 0.74]  1.000  0.750 [0.63, 0.85]
+
+  Distribution over seeds (IF only): FP count median [min, max]; recall median [2.5%, 97.5%]; F1 median [2.5%, 97.5%] (min-max)
+  Paper protocol: IF c=0.2 (train=test normals, all-runs mode)     FP 2 [2, 2]   recall 0.960 [0.760, 0.980]   F1 0.960 [0.844, 0.970] (0.556-0.970)
+  Clean: IF auto                                                   FP 4 [4, 10]   recall 0.988 [0.976, 0.988]   F1 0.956 [0.897, 0.956] (0.891-0.962)
+  Clean: IF c=0.2 (ref)                                            FP 1 [0, 2]   recall 0.906 [0.832, 0.926]   F1 0.941 [0.908, 0.952] (0.906-0.961)
+  Clean: IF budget 0/9                                             FP 0 [0, 0]   recall 0.124 [0.090, 0.676]   F1 0.221 [0.165, 0.807] (0.152-0.808)
+  Clean: IF budget 1/9                                             FP 0 [0, 0]   recall 0.664 [0.618, 0.678]   F1 0.798 [0.764, 0.808] (0.758-0.810)
+
+====================================================================================================
+D. RECALL BY ATTACK PATH  (HMI = trusted client, n=20; UA Expert = new client, n=30; 95% Clopper-Pearson)
+====================================================================================================
+  detector                                                            HMI         95% CI  UA Expert         95% CI
+  Paper protocol: IF c=0.2 (train=test normals, all-runs mode)      0.912 [0.68, 0.99]      0.974 [0.83, 1.00]
+  Clean: IF auto                                                    0.959 [0.75, 1.00]      1.000 [0.88, 1.00]
+  Clean: IF c=0.2 (ref)                                             0.833 [0.62, 0.97]      0.922 [0.78, 0.99]
+  Clean: IF budget 0/9                                              0.293 [0.12, 0.54]      0.333 [0.17, 0.53]
+  Clean: IF budget 1/9                                              0.647 [0.41, 0.85]      0.670 [0.47, 0.83]
+  Clean: Any setpoint write                                         1.000 [0.83, 1.00]      1.000 [0.88, 1.00]
+  Clean: New client                                                 0.000 [0.00, 0.17]      1.000 [0.88, 1.00]
+  Clean: Writes > train max OR new client                           0.550 [0.32, 0.77]      1.000 [0.88, 1.00]
+  Clean: New setpoint writer (post hoc)                             0.000 [0.00, 0.17]      1.000 [0.88, 1.00]
+
+  Recall by scenario x path (mean flag rate):
+                              paper IF  IF auto  IF budget 1/9  any write  new client  >max writes|new
+    scenario       path                                                                               
+    Oscillate      HMI            1.00     1.00           0.70        1.0         0.0             1.00
+                   UA Expert      0.99     1.00           0.70        1.0         1.0             1.00
+    Speed_TooFast  HMI            0.99     1.00           0.66        1.0         0.0             0.50
+                   UA Expert      0.98     1.00           0.67        1.0         1.0             1.00
+    Speed_TooSlow  HMI            0.75     0.85           0.52        1.0         0.0             0.00
+                   UA Expert      0.95     1.00           0.62        1.0         1.0             1.00
+    VariousThreats HMI            1.00     1.00           0.70        1.0         0.0             1.00
+                   UA Expert      0.99     1.00           0.70        1.0         1.0             1.00
+    WrongDirection HMI            0.82     0.95           0.65        1.0         0.0             0.25
+                   UA Expert      0.96     1.00           0.66        1.0         1.0             1.00
+
+====================================================================================================
+E. ORACLE-VALUE BOUND  (HYPOTHETICAL: written values are NOT in the released data)
+====================================================================================================
+  13 minutes have exactly one setpoint write, from the trusted HMI, and no new client:
+    normals  [6, 8, 9, 10]
+    attacks  [[11, 'Speed_TooFast'], [18, 'Speed_TooFast'], [21, 'Speed_TooSlow'], [22, 'Speed_TooSlow'], [23, 'Speed_TooSlow'], [28, 'Speed_TooSlow'], [31, 'WrongDirection'], [32, 'WrongDirection'], [33, 'WrongDirection']]
+  Without the value these 13 are the same event (one HMI write of iSpeedSetPoint). Scenario definitions
+  (notebook cell 7): normal 4-6, too fast 8-10, too slow 0-3, wrong direction negative. A range check
+  'commanded speed outside [4, 6]' would, IF each run's single write carried a value inside its scenario's
+  stated range, separate them exactly:
+    detector                                                          TP/9  FP/4
+    Paper protocol: IF c=0.2 (train=test normals, all-runs mode)      7.23  2.00
+    Clean: IF auto                                                    8.18  4.00
+    Clean: IF budget 1/9                                              5.23  0.00
+    Clean: Any setpoint write                                         9.00  4.00
+    Clean: New client                                                 0.00  0.00
+    Clean: Writes > train max OR new client                           0.00  0.00
+    Hypothetical range check, commanded speed outside [4, 6]             9     0
+  A consequence-weighted version would also rank them: Speed_TooFast: overspeed (+2 to +4 above band); Speed_TooSlow: underspeed (1 to 4 below band); WrongDirection: reversal (sign change).
+  Caveats: the bound assumes the scenario label describes the value actually written; 'approximately 4 to 6'
+  leaves the band edges uncertain; Oscillate/VariousThreats are not in this group. Only the pcaps can test it.
+
+====================================================================================================
+F. 3 SEP 2025 MULTI-STAGE RUN  (per minute; positives = Step 3 inst 8-20 and Step 5 inst 106-110, their table)
+====================================================================================================
+  clean model: mode from training normals = 165; contamination chosen by LOO FP budget on the 10 normals: budget 0 -> {0.1: 124, 0.15: 1, 0.2: 45, 0.25: 30}, budget 1 -> {0.15: 1, 0.2: 117, 0.25: 82}
+
+  Per-minute scores (IF: seed 42 and flag rate over 200 seeds):
+  detector                                      TP   FP  FN   TN   prec    rec     F1    F1 over seeds med [min,max]
+  Paper IF c=0.2 (saved-model protocol)          5    1  13   92  0.833  0.278  0.417   0.417 [0.190, 0.417]
+  Clean IF auto                                  6    1  12   92  0.857  0.333  0.480   0.480 [0.417, 0.480]
+  Clean IF c=0.2 (ref)                           5    1  13   92  0.833  0.278  0.417   0.417 [0.417, 0.417]
+  Clean IF budget 0/10                           0    0  18   93  0.000  0.000  0.000   0.000 [0.000, 0.480]
+  Clean IF budget 1/10                           6    1  12   92  0.857  0.333  0.480   0.417 [0.417, 0.480]
+  Any setpoint write                             6    1  12   92  0.857  0.333  0.480   0.480 [0.480, 0.480]
+  New client                                    18   93   0    0  0.162  1.000  0.279   0.279 [0.279, 0.279]
+  Writes > train max OR new client              18   93   0    0  0.162  1.000  0.279   0.279 [0.279, 0.279]
+  New setpoint writer (post hoc)                 3    0  15   93  1.000  0.167  0.286   0.286 [0.286, 0.286]
+
+  Per stage (seed 42): flagged minutes / stage minutes, and time to first detection in minutes from stage start
+  (minute granularity; S1, S2, S4 and post contain no OPC UA manipulation per their table, so any flag there is a false alarm).
+  First minute with a setpoint write, by stage: {'S3': 16, 'S4': 21, 'S5': 108}. Stage start is when the attacker began the step;
+  the write comes later (S3: RDP session to the HMI first), so '@+k' includes attacker dwell before the write.
+    stage                                       S1       S2         S3         S4       S5     post
+    detector                                                                                       
+    Any setpoint write                         0/4      0/3   3/13 @+8   1/85 @+0  3/5 @+2      0/1
+    Clean IF auto                              0/4      0/3   3/13 @+8   1/85 @+0  3/5 @+2      0/1
+    Clean IF budget 0/10                       0/4      0/3       0/13       0/85      0/5      0/1
+    Clean IF budget 1/10                       0/4      0/3   3/13 @+8   1/85 @+0  3/5 @+2      0/1
+    Clean IF c=0.2 (ref)                       0/4      0/3   2/13 @+9   1/85 @+0  3/5 @+2      0/1
+    New client                             4/4 @+0  3/3 @+0  13/13 @+0  85/85 @+0  5/5 @+0  1/1 @+0
+    New setpoint writer (post hoc)             0/4      0/3       0/13       0/85  3/5 @+2      0/1
+    Paper IF c=0.2 (saved-model protocol)      0/4      0/3   2/13 @+9   1/85 @+0  3/5 @+2      0/1
+    Writes > train max OR new client       4/4 @+0  3/3 @+0  13/13 @+0  85/85 @+0  5/5 @+0  1/1 @+0
+
+  Every setpoint write in the run:
+                               ts  instance    id.orig_h  id.orig_p  msg_size stage
+    2025-09-03 13:35:04.403785944        16 192.168.1.16      21809       165    S3
+    2025-09-03 13:36:04.347909927        17 192.168.1.16      21809       165    S3
+    2025-09-03 13:36:42.232882977        17 192.168.1.16      21809       165    S3
+    2025-09-03 13:38:11.773515940        19 192.168.1.16      21809       165    S3
+    2025-09-03 13:38:30.736015081        19 192.168.1.16      21809       165    S3
+    2025-09-03 13:40:21.898405075        21 192.168.1.16      21809       165    S4
+    2025-09-03 13:40:26.243664980        21 192.168.1.16      21809       165    S4
+    2025-09-03 15:07:43.766321898       108 192.168.1.36      51619       161    S5
+    2025-09-03 15:07:51.229866982       108 192.168.1.36      51619       161    S5
+    2025-09-03 15:07:57.564172029       108 192.168.1.36      51619       161    S5
+    2025-09-03 15:08:05.126853943       109 192.168.1.36      51619       161    S5
+    2025-09-03 15:09:12.767513037       110 192.168.1.36      51619       161    S5
+    2025-09-03 15:09:35.597351074       110 192.168.1.36      51619       161    S5
+    2025-09-03 15:09:39.271711111       110 192.168.1.36      51619       161    S5
+
+  Note: 192.168.1.36 (the UA Expert workstation) is connected in all 111 of 111 minutes (reads/publish), so 'new client' fires on every minute here.
+  Instance 21 (13:40, first minute of S4) holds two HMI writes, 21 s after the stated end of Step 3; their table
+  makes it a false positive for every write-based detector. Re-labelling it S3 is a judgement call; numbers above
+  keep their labels.

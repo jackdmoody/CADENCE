@@ -1,0 +1,55 @@
+detector,stage,minutes,flagged_seed42,flagged_mean,first_flag_seed42,ttd_min_seed42,first_write_in_stage,ttd_from_first_write_seed42,share_seeds_detecting
+Paper IF c=0.2 (saved-model protocol),S1,4,0,0.000,,,,,0.000
+Paper IF c=0.2 (saved-model protocol),S2,3,0,0.000,,,,,0.000
+Paper IF c=0.2 (saved-model protocol),S3,13,2,2.000,17.000,9.000,16.000,1.000,1.000
+Paper IF c=0.2 (saved-model protocol),S4,85,1,1.000,21.000,0.000,21.000,0.000,1.000
+Paper IF c=0.2 (saved-model protocol),S5,5,3,2.970,108.000,2.000,108.000,0.000,0.990
+Paper IF c=0.2 (saved-model protocol),post,1,0,0.000,,,,,0.000
+Clean IF auto,S1,4,0,0.000,,,,,0.000
+Clean IF auto,S2,3,0,0.000,,,,,0.000
+Clean IF auto,S3,13,3,2.840,16.000,8.000,16.000,0.000,1.000
+Clean IF auto,S4,85,1,1.000,21.000,0.000,21.000,0.000,1.000
+Clean IF auto,S5,5,3,3.000,108.000,2.000,108.000,0.000,1.000
+Clean IF auto,post,1,0,0.000,,,,,0.000
+Clean IF c=0.2 (ref),S1,4,0,0.000,,,,,0.000
+Clean IF c=0.2 (ref),S2,3,0,0.000,,,,,0.000
+Clean IF c=0.2 (ref),S3,13,2,2.000,17.000,9.000,16.000,1.000,1.000
+Clean IF c=0.2 (ref),S4,85,1,1.000,21.000,0.000,21.000,0.000,1.000
+Clean IF c=0.2 (ref),S5,5,3,3.000,108.000,2.000,108.000,0.000,1.000
+Clean IF c=0.2 (ref),post,1,0,0.000,,,,,0.000
+Clean IF budget 0/10,S1,4,0,0.000,,,,,0.000
+Clean IF budget 0/10,S2,3,0,0.000,,,,,0.000
+Clean IF budget 0/10,S3,13,0,0.905,,,16.000,,0.380
+Clean IF budget 0/10,S4,85,0,0.380,,,21.000,,0.380
+Clean IF budget 0/10,S5,5,0,1.140,,,108.000,,0.380
+Clean IF budget 0/10,post,1,0,0.000,,,,,0.000
+Clean IF budget 1/10,S1,4,0,0.000,,,,,0.000
+Clean IF budget 1/10,S2,3,0,0.000,,,,,0.000
+Clean IF budget 1/10,S3,13,3,2.405,16.000,8.000,16.000,0.000,1.000
+Clean IF budget 1/10,S4,85,1,1.000,21.000,0.000,21.000,0.000,1.000
+Clean IF budget 1/10,S5,5,3,3.000,108.000,2.000,108.000,0.000,1.000
+Clean IF budget 1/10,post,1,0,0.000,,,,,0.000
+Any setpoint write,S1,4,0,0.000,,,,,0.000
+Any setpoint write,S2,3,0,0.000,,,,,0.000
+Any setpoint write,S3,13,3,3.000,16.000,8.000,16.000,0.000,1.000
+Any setpoint write,S4,85,1,1.000,21.000,0.000,21.000,0.000,1.000
+Any setpoint write,S5,5,3,3.000,108.000,2.000,108.000,0.000,1.000
+Any setpoint write,post,1,0,0.000,,,,,0.000
+New client,S1,4,4,4.000,1.000,0.000,,,1.000
+New client,S2,3,3,3.000,5.000,0.000,,,1.000
+New client,S3,13,13,13.000,8.000,0.000,16.000,-8.000,1.000
+New client,S4,85,85,85.000,21.000,0.000,21.000,0.000,1.000
+New client,S5,5,5,5.000,106.000,0.000,108.000,-2.000,1.000
+New client,post,1,1,1.000,111.000,0.000,,,1.000
+Writes > train max OR new client,S1,4,4,4.000,1.000,0.000,,,1.000
+Writes > train max OR new client,S2,3,3,3.000,5.000,0.000,,,1.000
+Writes > train max OR new client,S3,13,13,13.000,8.000,0.000,16.000,-8.000,1.000
+Writes > train max OR new client,S4,85,85,85.000,21.000,0.000,21.000,0.000,1.000
+Writes > train max OR new client,S5,5,5,5.000,106.000,0.000,108.000,-2.000,1.000
+Writes > train max OR new client,post,1,1,1.000,111.000,0.000,,,1.000
+New setpoint writer (post hoc),S1,4,0,0.000,,,,,0.000
+New setpoint writer (post hoc),S2,3,0,0.000,,,,,0.000
+New setpoint writer (post hoc),S3,13,0,0.000,,,16.000,,0.000
+New setpoint writer (post hoc),S4,85,0,0.000,,,21.000,,0.000
+New setpoint writer (post hoc),S5,5,3,3.000,108.000,2.000,108.000,0.000,1.000
+New setpoint writer (post hoc),post,1,0,0.000,,,,,0.000

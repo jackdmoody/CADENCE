@@ -1,0 +1,541 @@
+detector,instance,flag_rate
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",1,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",2,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",3,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",4,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",5,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",6,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",7,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",8,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",9,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",10,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",11,0.9450
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",12,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",13,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",14,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",15,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",16,0.9400
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",17,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",18,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",19,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",20,0.9500
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",21,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",22,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",23,0.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",24,0.9450
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",25,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",26,0.9450
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",27,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",28,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",29,0.9600
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",30,0.8650
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",31,0.2900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",32,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",33,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",34,0.9850
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",35,0.9600
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",36,0.9350
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",37,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",38,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",39,0.9700
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",40,0.9500
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",41,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",42,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",43,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",44,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",45,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",46,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",47,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",48,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",49,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",50,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",51,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",52,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",53,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",54,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",55,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",56,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",57,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",58,1.0000
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",59,0.9900
+"Paper protocol: IF c=0.2 (train=test normals, all-runs mode)",60,0.9900
+Clean: IF auto,1,0.1350
+Clean: IF auto,2,0.1350
+Clean: IF auto,3,0.1350
+Clean: IF auto,4,0.1350
+Clean: IF auto,5,0.1350
+Clean: IF auto,6,1.0000
+Clean: IF auto,7,0.1350
+Clean: IF auto,8,1.0000
+Clean: IF auto,9,1.0000
+Clean: IF auto,10,1.0000
+Clean: IF auto,11,0.9880
+Clean: IF auto,12,1.0000
+Clean: IF auto,13,1.0000
+Clean: IF auto,14,1.0000
+Clean: IF auto,15,1.0000
+Clean: IF auto,16,1.0000
+Clean: IF auto,17,1.0000
+Clean: IF auto,18,1.0000
+Clean: IF auto,19,1.0000
+Clean: IF auto,20,1.0000
+Clean: IF auto,21,1.0000
+Clean: IF auto,22,1.0000
+Clean: IF auto,23,0.4060
+Clean: IF auto,24,1.0000
+Clean: IF auto,25,1.0000
+Clean: IF auto,26,1.0000
+Clean: IF auto,27,1.0000
+Clean: IF auto,28,1.0000
+Clean: IF auto,29,1.0000
+Clean: IF auto,30,1.0000
+Clean: IF auto,31,0.7870
+Clean: IF auto,32,1.0000
+Clean: IF auto,33,1.0000
+Clean: IF auto,34,1.0000
+Clean: IF auto,35,1.0000
+Clean: IF auto,36,1.0000
+Clean: IF auto,37,1.0000
+Clean: IF auto,38,1.0000
+Clean: IF auto,39,1.0000
+Clean: IF auto,40,1.0000
+Clean: IF auto,41,1.0000
+Clean: IF auto,42,1.0000
+Clean: IF auto,43,1.0000
+Clean: IF auto,44,1.0000
+Clean: IF auto,45,1.0000
+Clean: IF auto,46,1.0000
+Clean: IF auto,47,1.0000
+Clean: IF auto,48,1.0000
+Clean: IF auto,49,1.0000
+Clean: IF auto,50,1.0000
+Clean: IF auto,51,1.0000
+Clean: IF auto,52,1.0000
+Clean: IF auto,53,1.0000
+Clean: IF auto,54,1.0000
+Clean: IF auto,55,1.0000
+Clean: IF auto,56,1.0000
+Clean: IF auto,57,1.0000
+Clean: IF auto,58,1.0000
+Clean: IF auto,59,1.0000
+Clean: IF auto,60,1.0000
+Clean: IF c=0.2 (ref),1,0.0000
+Clean: IF c=0.2 (ref),2,0.0000
+Clean: IF c=0.2 (ref),3,0.0000
+Clean: IF c=0.2 (ref),4,0.0000
+Clean: IF c=0.2 (ref),5,0.0000
+Clean: IF c=0.2 (ref),6,0.0000
+Clean: IF c=0.2 (ref),7,0.0000
+Clean: IF c=0.2 (ref),8,0.6200
+Clean: IF c=0.2 (ref),9,0.0000
+Clean: IF c=0.2 (ref),10,0.0100
+Clean: IF c=0.2 (ref),11,0.3655
+Clean: IF c=0.2 (ref),12,0.9620
+Clean: IF c=0.2 (ref),13,0.9620
+Clean: IF c=0.2 (ref),14,0.9620
+Clean: IF c=0.2 (ref),15,0.9620
+Clean: IF c=0.2 (ref),16,0.9010
+Clean: IF c=0.2 (ref),17,0.9620
+Clean: IF c=0.2 (ref),18,0.9620
+Clean: IF c=0.2 (ref),19,0.9620
+Clean: IF c=0.2 (ref),20,0.9045
+Clean: IF c=0.2 (ref),21,0.5555
+Clean: IF c=0.2 (ref),22,0.9030
+Clean: IF c=0.2 (ref),23,0.2005
+Clean: IF c=0.2 (ref),24,0.9000
+Clean: IF c=0.2 (ref),25,0.9620
+Clean: IF c=0.2 (ref),26,0.9000
+Clean: IF c=0.2 (ref),27,0.9620
+Clean: IF c=0.2 (ref),28,0.9620
+Clean: IF c=0.2 (ref),29,0.9015
+Clean: IF c=0.2 (ref),30,0.3770
+Clean: IF c=0.2 (ref),31,0.2015
+Clean: IF c=0.2 (ref),32,0.9620
+Clean: IF c=0.2 (ref),33,0.9620
+Clean: IF c=0.2 (ref),34,0.9000
+Clean: IF c=0.2 (ref),35,0.9030
+Clean: IF c=0.2 (ref),36,0.9025
+Clean: IF c=0.2 (ref),37,0.9620
+Clean: IF c=0.2 (ref),38,0.9620
+Clean: IF c=0.2 (ref),39,0.9000
+Clean: IF c=0.2 (ref),40,0.9055
+Clean: IF c=0.2 (ref),41,0.9620
+Clean: IF c=0.2 (ref),42,0.9620
+Clean: IF c=0.2 (ref),43,0.9620
+Clean: IF c=0.2 (ref),44,0.9620
+Clean: IF c=0.2 (ref),45,0.9620
+Clean: IF c=0.2 (ref),46,0.9620
+Clean: IF c=0.2 (ref),47,0.9620
+Clean: IF c=0.2 (ref),48,0.9620
+Clean: IF c=0.2 (ref),49,0.9620
+Clean: IF c=0.2 (ref),50,0.9620
+Clean: IF c=0.2 (ref),51,0.9620
+Clean: IF c=0.2 (ref),52,0.9620
+Clean: IF c=0.2 (ref),53,0.9620
+Clean: IF c=0.2 (ref),54,0.9620
+Clean: IF c=0.2 (ref),55,0.9620
+Clean: IF c=0.2 (ref),56,0.9620
+Clean: IF c=0.2 (ref),57,0.9620
+Clean: IF c=0.2 (ref),58,0.9620
+Clean: IF c=0.2 (ref),59,0.9620
+Clean: IF c=0.2 (ref),60,0.9620
+Clean: IF budget 0/9,1,0.0000
+Clean: IF budget 0/9,2,0.0000
+Clean: IF budget 0/9,3,0.0000
+Clean: IF budget 0/9,4,0.0000
+Clean: IF budget 0/9,5,0.0000
+Clean: IF budget 0/9,6,0.0000
+Clean: IF budget 0/9,7,0.0000
+Clean: IF budget 0/9,8,0.0000
+Clean: IF budget 0/9,9,0.0000
+Clean: IF budget 0/9,10,0.0000
+Clean: IF budget 0/9,11,0.2040
+Clean: IF budget 0/9,12,0.3280
+Clean: IF budget 0/9,13,0.3280
+Clean: IF budget 0/9,14,0.3280
+Clean: IF budget 0/9,15,0.3280
+Clean: IF budget 0/9,16,0.2280
+Clean: IF budget 0/9,17,0.3280
+Clean: IF budget 0/9,18,0.3280
+Clean: IF budget 0/9,19,0.3280
+Clean: IF budget 0/9,20,0.2280
+Clean: IF budget 0/9,21,0.2880
+Clean: IF budget 0/9,22,0.2280
+Clean: IF budget 0/9,23,0.0450
+Clean: IF budget 0/9,24,0.3900
+Clean: IF budget 0/9,25,0.3280
+Clean: IF budget 0/9,26,0.3420
+Clean: IF budget 0/9,27,0.3280
+Clean: IF budget 0/9,28,0.3235
+Clean: IF budget 0/9,29,0.2280
+Clean: IF budget 0/9,30,0.2040
+Clean: IF budget 0/9,31,0.1820
+Clean: IF budget 0/9,32,0.3280
+Clean: IF budget 0/9,33,0.3280
+Clean: IF budget 0/9,34,0.8640
+Clean: IF budget 0/9,35,0.2280
+Clean: IF budget 0/9,36,0.2280
+Clean: IF budget 0/9,37,0.3280
+Clean: IF budget 0/9,38,0.3280
+Clean: IF budget 0/9,39,0.5890
+Clean: IF budget 0/9,40,0.2280
+Clean: IF budget 0/9,41,0.3280
+Clean: IF budget 0/9,42,0.3280
+Clean: IF budget 0/9,43,0.3280
+Clean: IF budget 0/9,44,0.3280
+Clean: IF budget 0/9,45,0.3280
+Clean: IF budget 0/9,46,0.3280
+Clean: IF budget 0/9,47,0.3280
+Clean: IF budget 0/9,48,0.3280
+Clean: IF budget 0/9,49,0.3280
+Clean: IF budget 0/9,50,0.3280
+Clean: IF budget 0/9,51,0.3280
+Clean: IF budget 0/9,52,0.3280
+Clean: IF budget 0/9,53,0.3280
+Clean: IF budget 0/9,54,0.3280
+Clean: IF budget 0/9,55,0.3280
+Clean: IF budget 0/9,56,0.3280
+Clean: IF budget 0/9,57,0.3280
+Clean: IF budget 0/9,58,0.3280
+Clean: IF budget 0/9,59,0.3280
+Clean: IF budget 0/9,60,0.3280
+Clean: IF budget 1/9,1,0.0000
+Clean: IF budget 1/9,2,0.0000
+Clean: IF budget 1/9,3,0.0000
+Clean: IF budget 1/9,4,0.0000
+Clean: IF budget 1/9,5,0.0000
+Clean: IF budget 1/9,6,0.0000
+Clean: IF budget 1/9,7,0.0000
+Clean: IF budget 1/9,8,0.0000
+Clean: IF budget 1/9,9,0.0000
+Clean: IF budget 1/9,10,0.0000
+Clean: IF budget 1/9,11,0.5490
+Clean: IF budget 1/9,12,0.7000
+Clean: IF budget 1/9,13,0.7000
+Clean: IF budget 1/9,14,0.7000
+Clean: IF budget 1/9,15,0.7000
+Clean: IF budget 1/9,16,0.6000
+Clean: IF budget 1/9,17,0.7000
+Clean: IF budget 1/9,18,0.7000
+Clean: IF budget 1/9,19,0.7000
+Clean: IF budget 1/9,20,0.6000
+Clean: IF budget 1/9,21,0.6790
+Clean: IF budget 1/9,22,0.6000
+Clean: IF budget 1/9,23,0.1200
+Clean: IF budget 1/9,24,0.6000
+Clean: IF budget 1/9,25,0.7000
+Clean: IF budget 1/9,26,0.6000
+Clean: IF budget 1/9,27,0.7000
+Clean: IF budget 1/9,28,0.7000
+Clean: IF budget 1/9,29,0.6000
+Clean: IF budget 1/9,30,0.5490
+Clean: IF budget 1/9,31,0.4850
+Clean: IF budget 1/9,32,0.7000
+Clean: IF budget 1/9,33,0.7000
+Clean: IF budget 1/9,34,0.8640
+Clean: IF budget 1/9,35,0.6000
+Clean: IF budget 1/9,36,0.6000
+Clean: IF budget 1/9,37,0.7000
+Clean: IF budget 1/9,38,0.7000
+Clean: IF budget 1/9,39,0.6010
+Clean: IF budget 1/9,40,0.6000
+Clean: IF budget 1/9,41,0.7000
+Clean: IF budget 1/9,42,0.7000
+Clean: IF budget 1/9,43,0.7000
+Clean: IF budget 1/9,44,0.7000
+Clean: IF budget 1/9,45,0.7000
+Clean: IF budget 1/9,46,0.7000
+Clean: IF budget 1/9,47,0.7000
+Clean: IF budget 1/9,48,0.7000
+Clean: IF budget 1/9,49,0.7000
+Clean: IF budget 1/9,50,0.7000
+Clean: IF budget 1/9,51,0.7000
+Clean: IF budget 1/9,52,0.7000
+Clean: IF budget 1/9,53,0.7000
+Clean: IF budget 1/9,54,0.7000
+Clean: IF budget 1/9,55,0.7000
+Clean: IF budget 1/9,56,0.7000
+Clean: IF budget 1/9,57,0.7000
+Clean: IF budget 1/9,58,0.7000
+Clean: IF budget 1/9,59,0.7000
+Clean: IF budget 1/9,60,0.7000
+Clean: Any setpoint write,1,0.0000
+Clean: Any setpoint write,2,0.0000
+Clean: Any setpoint write,3,0.0000
+Clean: Any setpoint write,4,0.0000
+Clean: Any setpoint write,5,0.0000
+Clean: Any setpoint write,6,1.0000
+Clean: Any setpoint write,7,0.0000
+Clean: Any setpoint write,8,1.0000
+Clean: Any setpoint write,9,1.0000
+Clean: Any setpoint write,10,1.0000
+Clean: Any setpoint write,11,1.0000
+Clean: Any setpoint write,12,1.0000
+Clean: Any setpoint write,13,1.0000
+Clean: Any setpoint write,14,1.0000
+Clean: Any setpoint write,15,1.0000
+Clean: Any setpoint write,16,1.0000
+Clean: Any setpoint write,17,1.0000
+Clean: Any setpoint write,18,1.0000
+Clean: Any setpoint write,19,1.0000
+Clean: Any setpoint write,20,1.0000
+Clean: Any setpoint write,21,1.0000
+Clean: Any setpoint write,22,1.0000
+Clean: Any setpoint write,23,1.0000
+Clean: Any setpoint write,24,1.0000
+Clean: Any setpoint write,25,1.0000
+Clean: Any setpoint write,26,1.0000
+Clean: Any setpoint write,27,1.0000
+Clean: Any setpoint write,28,1.0000
+Clean: Any setpoint write,29,1.0000
+Clean: Any setpoint write,30,1.0000
+Clean: Any setpoint write,31,1.0000
+Clean: Any setpoint write,32,1.0000
+Clean: Any setpoint write,33,1.0000
+Clean: Any setpoint write,34,1.0000
+Clean: Any setpoint write,35,1.0000
+Clean: Any setpoint write,36,1.0000
+Clean: Any setpoint write,37,1.0000
+Clean: Any setpoint write,38,1.0000
+Clean: Any setpoint write,39,1.0000
+Clean: Any setpoint write,40,1.0000
+Clean: Any setpoint write,41,1.0000
+Clean: Any setpoint write,42,1.0000
+Clean: Any setpoint write,43,1.0000
+Clean: Any setpoint write,44,1.0000
+Clean: Any setpoint write,45,1.0000
+Clean: Any setpoint write,46,1.0000
+Clean: Any setpoint write,47,1.0000
+Clean: Any setpoint write,48,1.0000
+Clean: Any setpoint write,49,1.0000
+Clean: Any setpoint write,50,1.0000
+Clean: Any setpoint write,51,1.0000
+Clean: Any setpoint write,52,1.0000
+Clean: Any setpoint write,53,1.0000
+Clean: Any setpoint write,54,1.0000
+Clean: Any setpoint write,55,1.0000
+Clean: Any setpoint write,56,1.0000
+Clean: Any setpoint write,57,1.0000
+Clean: Any setpoint write,58,1.0000
+Clean: Any setpoint write,59,1.0000
+Clean: Any setpoint write,60,1.0000
+Clean: New client,1,0.0000
+Clean: New client,2,0.0000
+Clean: New client,3,0.0000
+Clean: New client,4,0.0000
+Clean: New client,5,0.0000
+Clean: New client,6,0.0000
+Clean: New client,7,0.0000
+Clean: New client,8,0.0000
+Clean: New client,9,0.0000
+Clean: New client,10,0.0000
+Clean: New client,11,0.0000
+Clean: New client,12,0.0000
+Clean: New client,13,0.0000
+Clean: New client,14,1.0000
+Clean: New client,15,1.0000
+Clean: New client,16,1.0000
+Clean: New client,17,1.0000
+Clean: New client,18,0.0000
+Clean: New client,19,1.0000
+Clean: New client,20,1.0000
+Clean: New client,21,0.0000
+Clean: New client,22,0.0000
+Clean: New client,23,0.0000
+Clean: New client,24,1.0000
+Clean: New client,25,1.0000
+Clean: New client,26,1.0000
+Clean: New client,27,1.0000
+Clean: New client,28,0.0000
+Clean: New client,29,1.0000
+Clean: New client,30,1.0000
+Clean: New client,31,0.0000
+Clean: New client,32,0.0000
+Clean: New client,33,0.0000
+Clean: New client,34,1.0000
+Clean: New client,35,1.0000
+Clean: New client,36,1.0000
+Clean: New client,37,1.0000
+Clean: New client,38,0.0000
+Clean: New client,39,1.0000
+Clean: New client,40,1.0000
+Clean: New client,41,0.0000
+Clean: New client,42,0.0000
+Clean: New client,43,0.0000
+Clean: New client,44,1.0000
+Clean: New client,45,1.0000
+Clean: New client,46,1.0000
+Clean: New client,47,1.0000
+Clean: New client,48,0.0000
+Clean: New client,49,1.0000
+Clean: New client,50,1.0000
+Clean: New client,51,0.0000
+Clean: New client,52,0.0000
+Clean: New client,53,0.0000
+Clean: New client,54,1.0000
+Clean: New client,55,1.0000
+Clean: New client,56,1.0000
+Clean: New client,57,1.0000
+Clean: New client,58,0.0000
+Clean: New client,59,1.0000
+Clean: New client,60,1.0000
+Clean: Writes > train max OR new client,1,0.0000
+Clean: Writes > train max OR new client,2,0.0000
+Clean: Writes > train max OR new client,3,0.0000
+Clean: Writes > train max OR new client,4,0.0000
+Clean: Writes > train max OR new client,5,0.0000
+Clean: Writes > train max OR new client,6,0.0000
+Clean: Writes > train max OR new client,7,0.0000
+Clean: Writes > train max OR new client,8,0.0000
+Clean: Writes > train max OR new client,9,0.0000
+Clean: Writes > train max OR new client,10,0.0000
+Clean: Writes > train max OR new client,11,0.0000
+Clean: Writes > train max OR new client,12,1.0000
+Clean: Writes > train max OR new client,13,1.0000
+Clean: Writes > train max OR new client,14,1.0000
+Clean: Writes > train max OR new client,15,1.0000
+Clean: Writes > train max OR new client,16,1.0000
+Clean: Writes > train max OR new client,17,1.0000
+Clean: Writes > train max OR new client,18,0.0000
+Clean: Writes > train max OR new client,19,1.0000
+Clean: Writes > train max OR new client,20,1.0000
+Clean: Writes > train max OR new client,21,0.0000
+Clean: Writes > train max OR new client,22,0.0000
+Clean: Writes > train max OR new client,23,0.0000
+Clean: Writes > train max OR new client,24,1.0000
+Clean: Writes > train max OR new client,25,1.0000
+Clean: Writes > train max OR new client,26,1.0000
+Clean: Writes > train max OR new client,27,1.0000
+Clean: Writes > train max OR new client,28,0.0000
+Clean: Writes > train max OR new client,29,1.0000
+Clean: Writes > train max OR new client,30,1.0000
+Clean: Writes > train max OR new client,31,0.0000
+Clean: Writes > train max OR new client,32,0.0000
+Clean: Writes > train max OR new client,33,0.0000
+Clean: Writes > train max OR new client,34,1.0000
+Clean: Writes > train max OR new client,35,1.0000
+Clean: Writes > train max OR new client,36,1.0000
+Clean: Writes > train max OR new client,37,1.0000
+Clean: Writes > train max OR new client,38,1.0000
+Clean: Writes > train max OR new client,39,1.0000
+Clean: Writes > train max OR new client,40,1.0000
+Clean: Writes > train max OR new client,41,1.0000
+Clean: Writes > train max OR new client,42,1.0000
+Clean: Writes > train max OR new client,43,1.0000
+Clean: Writes > train max OR new client,44,1.0000
+Clean: Writes > train max OR new client,45,1.0000
+Clean: Writes > train max OR new client,46,1.0000
+Clean: Writes > train max OR new client,47,1.0000
+Clean: Writes > train max OR new client,48,1.0000
+Clean: Writes > train max OR new client,49,1.0000
+Clean: Writes > train max OR new client,50,1.0000
+Clean: Writes > train max OR new client,51,1.0000
+Clean: Writes > train max OR new client,52,1.0000
+Clean: Writes > train max OR new client,53,1.0000
+Clean: Writes > train max OR new client,54,1.0000
+Clean: Writes > train max OR new client,55,1.0000
+Clean: Writes > train max OR new client,56,1.0000
+Clean: Writes > train max OR new client,57,1.0000
+Clean: Writes > train max OR new client,58,1.0000
+Clean: Writes > train max OR new client,59,1.0000
+Clean: Writes > train max OR new client,60,1.0000
+Clean: New setpoint writer (post hoc),1,0.0000
+Clean: New setpoint writer (post hoc),2,0.0000
+Clean: New setpoint writer (post hoc),3,0.0000
+Clean: New setpoint writer (post hoc),4,0.0000
+Clean: New setpoint writer (post hoc),5,0.0000
+Clean: New setpoint writer (post hoc),6,0.0000
+Clean: New setpoint writer (post hoc),7,0.0000
+Clean: New setpoint writer (post hoc),8,0.0000
+Clean: New setpoint writer (post hoc),9,0.0000
+Clean: New setpoint writer (post hoc),10,0.0000
+Clean: New setpoint writer (post hoc),11,0.0000
+Clean: New setpoint writer (post hoc),12,0.0000
+Clean: New setpoint writer (post hoc),13,0.0000
+Clean: New setpoint writer (post hoc),14,1.0000
+Clean: New setpoint writer (post hoc),15,1.0000
+Clean: New setpoint writer (post hoc),16,1.0000
+Clean: New setpoint writer (post hoc),17,1.0000
+Clean: New setpoint writer (post hoc),18,0.0000
+Clean: New setpoint writer (post hoc),19,1.0000
+Clean: New setpoint writer (post hoc),20,1.0000
+Clean: New setpoint writer (post hoc),21,0.0000
+Clean: New setpoint writer (post hoc),22,0.0000
+Clean: New setpoint writer (post hoc),23,0.0000
+Clean: New setpoint writer (post hoc),24,1.0000
+Clean: New setpoint writer (post hoc),25,1.0000
+Clean: New setpoint writer (post hoc),26,1.0000
+Clean: New setpoint writer (post hoc),27,1.0000
+Clean: New setpoint writer (post hoc),28,0.0000
+Clean: New setpoint writer (post hoc),29,1.0000
+Clean: New setpoint writer (post hoc),30,1.0000
+Clean: New setpoint writer (post hoc),31,0.0000
+Clean: New setpoint writer (post hoc),32,0.0000
+Clean: New setpoint writer (post hoc),33,0.0000
+Clean: New setpoint writer (post hoc),34,1.0000
+Clean: New setpoint writer (post hoc),35,1.0000
+Clean: New setpoint writer (post hoc),36,1.0000
+Clean: New setpoint writer (post hoc),37,1.0000
+Clean: New setpoint writer (post hoc),38,0.0000
+Clean: New setpoint writer (post hoc),39,1.0000
+Clean: New setpoint writer (post hoc),40,1.0000
+Clean: New setpoint writer (post hoc),41,0.0000
+Clean: New setpoint writer (post hoc),42,0.0000
+Clean: New setpoint writer (post hoc),43,0.0000
+Clean: New setpoint writer (post hoc),44,1.0000
+Clean: New setpoint writer (post hoc),45,1.0000
+Clean: New setpoint writer (post hoc),46,1.0000
+Clean: New setpoint writer (post hoc),47,1.0000
+Clean: New setpoint writer (post hoc),48,0.0000
+Clean: New setpoint writer (post hoc),49,1.0000
+Clean: New setpoint writer (post hoc),50,1.0000
+Clean: New setpoint writer (post hoc),51,0.0000
+Clean: New setpoint writer (post hoc),52,0.0000
+Clean: New setpoint writer (post hoc),53,0.0000
+Clean: New setpoint writer (post hoc),54,1.0000
+Clean: New setpoint writer (post hoc),55,1.0000
+Clean: New setpoint writer (post hoc),56,1.0000
+Clean: New setpoint writer (post hoc),57,1.0000
+Clean: New setpoint writer (post hoc),58,0.0000
+Clean: New setpoint writer (post hoc),59,1.0000
+Clean: New setpoint writer (post hoc),60,1.0000
