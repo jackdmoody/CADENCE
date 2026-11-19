@@ -4,7 +4,22 @@ All notable changes to CADENCE are documented here.
 
 ---
 
-## [3.0.0] — Current
+## [Unreleased] — Real-data evaluation
+
+### Added
+- **`zeek_adapter.py`** — Converts native Zeek logs (TSV or JSON, rotated and gzipped) or pcaps into the CSVs the loaders expect. Maps unset `service` to `unknown` and unset durations/bytes to 0 so the loader's missing-value drop no longer deletes custom-protocol C2. Handles ISO-8601 JSON timestamps, list fields, and IoT-23's space-separated label columns.
+- **`ground_truth.py`** — Pair-level ground truth from CTU-13 `.binetflow` labels, labeled Zeek conn logs (IoT-23), or known victim → C2 pairs. Scoring reports precision/recall/F1 at the beacon and corroborated stages (strict and lenient views of non-C2 malicious traffic), average precision, recall@k, and the furthest stage each C2 pair reached.
+- **`run_real_data.py`** — End-to-end runner for real data with flags for internal CIDRs, period floor, fan-in guard, pair cap, contamination and conn-only runs. Saves per-stage tables so runs can be re-scored without re-running.
+- **`PrefilterConfig.internal_cidrs`** — Extra networks treated as internal, for datasets on public address space (e.g. the CTU-13 campus).
+- **`PrefilterConfig.min_sources_for_fanin`** (default 10) — The fan-in filter is skipped when there are too few unique sources for its fraction to mean anything.
+- **`test_real_data.py`** — Adapter, prefilter, ground-truth and scoring tests, plus a round trip asserting that synthetic data written as native Zeek logs produces stage-for-stage identical results to the direct CSV path.
+
+### Fixed
+- README real-data export tips described a `zeek-cut` workflow whose native column names the loader does not read. Replaced with the adapter workflow.
+
+---
+
+## [3.0.0]
 
 ### Added
 - **Channel-level grouping keys** — The analysis unit is now `(src_ip, dst_ip, dst_port, proto)` rather than `(src_ip, dst_ip)`. Configurable via `cfg.pair.channel_key`. Downstream stages (SAX, periodicity, scoring, corroboration, changepoint) all propagate `channel_id`. Legacy `(src_ip, dst_ip)` behaviour is available by setting `channel_key = ("src_ip", "dst_ip")`.

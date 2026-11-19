@@ -1,0 +1,6 @@
+
+# Real-data runs: raw downloads and Zeek output stay local
+data/
+*.pcap
+*.pcapng
+*.pcap.bz2

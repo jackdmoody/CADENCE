@@ -172,6 +172,13 @@ class PrefilterConfig:
     """
     dst_fanin_threshold:   float = 0.50   # fraction of unique srcs above which dst is shared infra
     failed_conn_threshold: float = 0.90   # fraction of failed conn states to call a pair "dead"
+    # Extra CIDRs treated as internal on top of RFC 1918 / loopback / link-local.
+    # Needed for datasets whose hosts sit on public space, e.g. the CTU-13 campus.
+    internal_cidrs:        Tuple[str, ...] = ()
+    # The fan-in filter is a fraction of unique sources, so on captures with
+    # only a handful of hosts every destination looks like shared infrastructure.
+    # Skip the fan-in filter below this many unique sources.
+    min_sources_for_fanin: int   = 10
 
 
 @dataclass

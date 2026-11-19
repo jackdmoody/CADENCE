@@ -130,25 +130,38 @@ DEFAULT_FAILED_CONN_RATIO = 0.90
 # RFC 1918 / link-local / loopback checks
 # ---------------------------------------------------------------------------
 
-def _is_internal(ip_str: str) -> bool:
+# RFC 5737 documentation ranges — treat as external, not internal.
+# These are used by synthetic data generators as stand-ins for
+# real external C2 destinations.
+_DOC_RANGES = (
+    ipaddress.ip_network("192.0.2.0/24"),
+    ipaddress.ip_network("198.51.100.0/24"),
+    ipaddress.ip_network("203.0.113.0/24"),
+)
+
+
+def _parse_networks(cidrs) -> tuple:
+    """Parse configured internal CIDR strings; bad entries raise immediately."""
+    return tuple(ipaddress.ip_network(c, strict=False) for c in (cidrs or ()))
+
+
+def _is_internal(ip_str: str, extra_networks: tuple = ()) -> bool:
     """
-    Check if an IP is RFC 1918 private, loopback, link-local, or multicast.
+    Check if an IP is RFC 1918 private, loopback, link-local, or multicast,
+    or falls inside one of the configured extra internal networks.
 
     Excludes RFC 5737 documentation ranges (192.0.2.0/24, 198.51.100.0/24,
     203.0.113.0/24) which Python's ipaddress.is_private treats as private
     but are commonly used as simulated external IPs in synthetic datasets.
+    Configured networks win over that exclusion.
     """
     try:
         addr = ipaddress.ip_address(ip_str)
 
-        # RFC 5737 documentation ranges — treat as external, not internal.
-        # These are used by synthetic data generators as stand-ins for
-        # real external C2 destinations.
-        _DOC_RANGES = [
-            ipaddress.ip_network("192.0.2.0/24"),
-            ipaddress.ip_network("198.51.100.0/24"),
-            ipaddress.ip_network("203.0.113.0/24"),
-        ]
+        for net in extra_networks:
+            if addr.version == net.version and addr in net:
+                return True
+
         for net in _DOC_RANGES:
             if addr in net:
                 return False
@@ -201,11 +214,24 @@ def _build_high_fanin_set(
     threshold: float = DEFAULT_DST_FANIN_THRESHOLD,
     src_col: str = "src_ip",
     dst_col: str = "dst_ip",
+    min_sources: int = 0,
 ) -> set[str]:
     """
     Return the set of destination IPs contacted by more than `threshold`
     fraction of all unique source IPs.
+
+    With fewer than `min_sources` unique sources the fraction is meaningless
+    (one victim host gives every destination 100% fan-in), so the filter is
+    skipped and an empty set returned.
     """
+    n_sources = raw_df[src_col].nunique()
+    if n_sources < min_sources:
+        log.info(
+            "Fan-in filter skipped: %d unique sources < min_sources_for_fanin=%d",
+            n_sources, min_sources,
+        )
+        return set()
+
     fanin = compute_dst_fanin(raw_df, src_col, dst_col)
     popular = fanin[fanin > threshold]
 
@@ -293,6 +319,7 @@ def _classify_pair(
     dead_pairs: set[tuple[str, str]],
     custom_allowlist: Optional[set] = None,
     custom_cdn_prefixes: Optional[list] = None,
+    internal_networks: tuple = (),
 ) -> Optional[str]:
     """
     Classify a single pair as filtered or not.
@@ -305,7 +332,7 @@ def _classify_pair(
     cdn_prefixes = custom_cdn_prefixes or KNOWN_CDN_PREFIXES
 
     # 1. Both internal → no C2 relevance
-    if _is_internal(src_ip) and _is_internal(dst_ip):
+    if _is_internal(src_ip, internal_networks) and _is_internal(dst_ip, internal_networks):
         return "both_internal"
 
     # 2. Destination is a known DNS resolver
@@ -317,7 +344,7 @@ def _classify_pair(
         return "known_ntp"
 
     # 4. Known infrastructure port to internal destination
-    if dst_port and dst_port in INFRASTRUCTURE_PORTS and _is_internal(dst_ip):
+    if dst_port and dst_port in INFRASTRUCTURE_PORTS and _is_internal(dst_ip, internal_networks):
         return "infrastructure_port_internal"
 
     # 5. Destination in known CDN CIDR
@@ -377,6 +404,10 @@ def apply_prefilter(
                       else getattr(cfg.prefilter, "dst_fanin_threshold",   DEFAULT_DST_FANIN_THRESHOLD)
     _failed_thresh  = failed_conn_threshold if failed_conn_threshold is not None \
                       else getattr(cfg.prefilter, "failed_conn_threshold", DEFAULT_FAILED_CONN_RATIO)
+    _internal_nets  = _parse_networks(getattr(cfg.prefilter, "internal_cidrs", ()))
+    _min_sources    = int(getattr(cfg.prefilter, "min_sources_for_fanin", 0))
+    if _internal_nets:
+        log.info("Pre-filter: extra internal networks %s", ", ".join(map(str, _internal_nets)))
     n_before = len(pair_df)
 
     # --- Build lookup sets from raw flow data ---
@@ -391,7 +422,7 @@ def apply_prefilter(
                 break
 
         high_fanin_dsts = _build_high_fanin_set(
-            raw_df, _fanin_thresh, src_col, dst_col,
+            raw_df, _fanin_thresh, src_col, dst_col, min_sources=_min_sources,
         )
 
         if state_col:
@@ -424,6 +455,7 @@ def apply_prefilter(
             src, dst, port,
             high_fanin_dsts, dead_pairs,
             custom_allowlist, custom_cdn_prefixes,
+            internal_networks=_internal_nets,
         )
         reasons.append(reason)
 
@@ -459,6 +491,7 @@ def apply_prefilter(
                 set(),  # empty fanin set
                 dead_pairs,
                 custom_allowlist, custom_cdn_prefixes,
+                internal_networks=_internal_nets,
             )
             reasons2.append(reason)
 

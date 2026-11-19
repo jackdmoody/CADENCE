@@ -247,32 +247,67 @@ zkg install zeek/salesforce/ja3
 
 ---
 
-### CSV export tips for real-world data
+### Running on real Zeek data
 
-**From a live Zeek sensor:**
+`loaders.py` reads ECS-style conn columns (`timestamp`, `source.ip`, `destination.bytes`, ...), so native Zeek logs need converting first. `run_real_data.py` converts, runs, and optionally scores in one step.
+
 ```bash
-# Rotate and export last 30 days of logs
-find /opt/zeek/logs -name "conn.*.log.gz" -mtime -30 \
-    | xargs zcat | zeek-cut ts id.orig_h id.orig_p id.resp_h id.resp_p \
-      proto service duration orig_bytes resp_bytes orig_pkts resp_pkts conn_state \
-    > conn.csv
+# Native Zeek logs: TSV or JSON, rotated and gzipped files are fine
+python run_real_data.py --zeek-dir /path/to/zeek/logs --output results/myrun
+
+# Raw pcaps (needs zeek on PATH; add --zeek-script ja3 if the JA3 package is installed)
+python run_real_data.py --pcap capture.pcap --output results/myrun
+
+# Conversion only
+python -m analytic_pipeline.zeek_adapter --zeek-dir /path/to/zeek/logs --out data/converted
 ```
 
-**From Zeek's TSV format:** Zeek's default log format is tab-separated with a `#fields` header line. Export with `zeek-cut` (shown above) or use `zeek-cut -d ,` for comma-separated output. Remove the `#` comment lines before ingesting.
+The adapter (`analytic_pipeline/zeek_adapter.py`) maps native field names onto the loader schema and fixes things that silently lose data:
 
-**From a SIEM:** If your SIEM indexes Zeek logs using ECS (Elastic Common Schema) field names (`source.ip`, `destination.port`, `event.duration` etc.), CADENCE accepts those directly — `loaders.py` renames them automatically before processing.
+- Zeek writes `-` for `service` when it cannot identify the protocol. The loader drops rows with a missing service, which would delete custom-protocol C2, so these become `unknown`.
+- `-` durations, bytes and packet counts become 0 (single-packet and failed connections).
+- JSON logs with ISO-8601 timestamps are converted to epoch seconds, and list fields (`answers`, `TTLs`) to comma-separated strings.
+- IoT-23's `conn.log.labeled` separates its last three columns with spaces instead of tabs. They are split back out so `label` and `detailed-label` survive.
 
-**Timestamp format:** The pipeline expects `ts` as Unix float seconds (e.g. `1729123456.123`). If your export uses ISO 8601 strings, convert first:
-```python
-import pandas as pd
-df = pd.read_csv("conn.csv")
-df["ts"] = pd.to_datetime(df["ts"]).astype("int64") / 1e9
-df.to_csv("conn.csv", index=False)
+**Settings that matter on real data**
+
+| Flag | Default | Why it matters |
+|---|---|---|
+| `--internal-cidr` | none | The pre-filter only treats RFC 1918 space as internal. Datasets on public addresses (e.g. `147.32.0.0/16` for the CTU campus in CTU-13) need their range added or internal-to-internal traffic floods the candidate set. Repeatable. |
+| `--min-period-s` | 60 | Periodicity and scoring ignore periods below this floor, so faster beacons are invisible. Lower it for samples beaconing every few seconds. |
+| `--min-sources-for-fanin` | 10 | The fan-in filter is a fraction of unique sources. With only a few hosts every destination looks like shared infrastructure, so the filter is skipped below this count. |
+| `--max-pairs` | 5000 | Cap on anomalous pairs sent to SAX, richest first. Raise it on large captures so low-rate C2 is not cut. |
+| `--conn-only` | off | Runs without DNS/HTTP/TLS logs, for datasets where application-layer data exists for only one class (see CTU-13 below). |
+
+**Scoring against ground truth**
+
+```bash
+# CTU-13: labels live in the Argus .binetflow files
+python -m analytic_pipeline.ground_truth ctu13 --binetflow capture20110810.binetflow --out gt.csv
+
+# IoT-23: labels ride along in conn.log.labeled
+python -m analytic_pipeline.ground_truth zeek-labeled --conn conn.log.labeled --out gt.csv
+
+# Known victim -> C2 pairs (e.g. Active Countermeasures posts list both IPs)
+python -m analytic_pipeline.ground_truth pairs --pair 192.168.2.115 64.23.212.29 --out gt.csv
+
+python run_real_data.py --zeek-dir /path/to/logs --output results/run --gt gt.csv
+
+# Re-score a finished run against different ground truth without re-running
+python -m analytic_pipeline.ground_truth score --run-dir results/run --gt other_gt.csv
 ```
+
+Scoring is at the `(src_ip, dst_ip)` pair level, the unit stages 5–9 flag. A pair is C2 if any of its flows carries a C2 label. Infected-host traffic that is not C2 (spam, scans) is `malicious_other` and scored two ways. **Strict** counts it as negative, **lenient** drops it from the universe.
+
+| Output | Contents |
+|---|---|
+| `metrics.json` | Precision, recall and F1 at the beacon stage and the corroborated stage (strict and lenient), a detectable-only view that drops C2 pairs below the minimum flow count, average precision, recall@10/50/100, C2 pairs by stage, and pre-filter reasons for C2 pairs it removed |
+| `gt_pairs_by_stage.csv` | The furthest stage each ground-truth pair reached, with scores. `reverse_in_conn` flags pairs whose direction disagrees with Zeek's originator |
+| `stages/*.csv` | Per-stage tables, including `pair_stages.csv` for every pair in the conn data |
+
+**CTU-13 caveat.** The full-capture pcaps are truncated for privacy, so Zeek writes DNS/HTTP/TLS records mostly for the botnet traffic that was also captured in full. Mixing them lets corroboration separate the classes for free. Report `--conn-only` numbers as the headline (nothing is corroborated without the extra logs, so read the beacon-stage metrics) and run corroboration as a separate ablation.
 
 ---
-
-
 
 ### Run the full pipeline with synthetic data
 
@@ -387,12 +422,14 @@ Every tunable parameter is documented below with its default value and a justifi
 
 ### Pre-Filter (`prefilter`)
 
-These thresholds are defined as module-level constants in `prefilter.py` (not yet migrated to a `PrefilterConfig` dataclass).
+These are set in `PrefilterConfig` (`cfg.prefilter`).
 
 | Parameter | Default | Justification |
 |---|---|---|
 | `dst_fanin_threshold` | `0.50` | A destination contacted by more than 50% of all unique source IPs in the dataset is almost certainly shared infrastructure (DNS resolver, proxy, CDN edge). C2 servers are contacted by one or a small number of infected hosts, not by half the network. Setting this below ~0.30 risks filtering C2 destinations in small networks; above ~0.70 lets shared services leak through. 0.50 balances these risks for medium-to-large enterprise networks. |
 | `failed_conn_threshold` | `0.90` | If >90% of a channel's connection states are failure codes (S0, REJ, RSTO, etc.), the channel represents scanning, port probes, or dead services — not a functioning C2 link. Real C2 beacons require successful TCP handshakes to receive commands, so their failure rate is typically <10%. The 90% threshold is conservative: it only removes channels that are overwhelmingly failed, minimising the risk of filtering a C2 channel that experienced transient connectivity issues. |
+| `internal_cidrs` | `()` | Extra networks treated as internal alongside RFC 1918, loopback and link-local. Needed when a dataset's hosts sit on public addresses. Configured networks also override the RFC 5737 documentation-range exclusion. |
+| `min_sources_for_fanin` | `10` | The fan-in filter is skipped below this many unique source IPs. With one victim host every destination has 100% fan-in, and with two or three the fraction is too coarse to separate shared infrastructure from C2. |
 
 ---
 
@@ -615,6 +652,8 @@ The generator injects six scenarios into 30 days of realistic background traffic
 | `pipeline.py` | — | `BDPPipeline.run()` orchestrator. Sequences all 10 stages. Accepts `ssl_log_path`. |
 | `report.py` | — | Self-contained HTML report generator. H1–H6 evidence cards, channel key display, TLS score pills. |
 | `generate_synthetic_data.py` | — | Synthetic Zeek log generator (conn + dns + http + ssl). Ground-truth labels for pipeline validation. |
+| `zeek_adapter.py` | — | Native Zeek logs (TSV, JSON, gzip) or pcaps → CADENCE CSVs. Handles unset fields, ISO timestamps and the IoT-23 label-column quirk. |
+| `ground_truth.py` | — | Pair-level ground truth from CTU-13 binetflows, labeled Zeek logs or known pairs. Stage-by-stage scoring with strict and lenient metrics. |
 
 ---
 
