@@ -31,6 +31,34 @@ from analytic_pipeline.generate_synthetic_data import SyntheticDataGenerator, ev
 from analytic_pipeline import ground_truth as gtm  # noqa: E402
 import run_real_data  # noqa: E402
 
+import analytic_pipeline.periodicity as _per  # noqa: E402
+from scipy import signal as _signal  # noqa: E402
+
+
+def _spectral_original(iat_or_ts, min_period_s):
+    """The pre-v3.1 implementation: Welch on the IAT sequence with fs=1.0 (units bug)."""
+    ts = np.asarray(iat_or_ts, dtype=float)
+    iat = np.diff(ts)
+    iat = iat[iat > 0]
+    n = len(iat)
+    if n < 8:
+        return 0.0, 0.0
+    freqs, psd = _signal.welch(iat, fs=1.0, nperseg=min(n, 64))
+    with np.errstate(divide="ignore", invalid="ignore"):
+        periods = np.where(freqs > 0, 1.0 / freqs, 0.0)
+    valid = (freqs > 0) & (periods >= min_period_s)
+    if not valid.any():
+        return 0.0, 0.0
+    i = int(np.argmax(psd[valid]))
+    return float(periods[valid][i]), float(psd[valid][i] / (psd[valid].sum() + 1e-12))
+
+
+SPECTRAL_VARIANTS = {
+    "fixed": _per._fft_dominant_period,
+    "original": _spectral_original,
+    "none": lambda ts, m: (0.0, 0.0),
+}
+
 # Stage cuts for the ablation: "stop the pipeline after stage X and alarm on everything that reached it"
 CUTS = {
     "IForest anomaly (stages 1-4)":   gtm.STAGE_RANK["sax_not_evaluated"],
@@ -123,12 +151,16 @@ def main() -> None:
     p.add_argument("--days", type=int, default=30)
     p.add_argument("--bg-rows", type=int, default=30_000)
     p.add_argument("--noisy-rows", type=int, default=1_000)
+    p.add_argument("--spectral", choices=list(SPECTRAL_VARIANTS), default="fixed",
+                   help="Spectral confirmation variant (ablation of the v3.1 fix)")
     a = p.parse_args()
+    _per._fft_dominant_period = SPECTRAL_VARIANTS[a.spectral]
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     results = []
     for s in a.seeds:
         r = run_seed(s, out, a.days, a.bg_rows, a.noisy_rows)
+        r["spectral"] = a.spectral
         m = r["metrics"]["strict"]
         print(f"seed {s:>3}  rows {r['n_conn_rows']:,}  corr P={m['corroborated_stage']['precision']:.3f} "
               f"R={m['corroborated_stage']['recall']:.3f}  beacon P={m['beacon_stage']['precision']:.3f} "

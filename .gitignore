@@ -4,3 +4,12 @@ data/
 *.pcap
 *.pcapng
 *.pcap.bz2
+
+# LaTeX build products
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
