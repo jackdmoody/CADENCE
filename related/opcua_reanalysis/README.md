@@ -13,4 +13,16 @@ python related/opcua_reanalysis/opcua_baselines.py \
   data/opcua/20250903_Network_OPCUA_enriched_features_instanced_file2.csv
 ```
 
-`results_reproduction.txt` is the script's output. Rerun on 19 Nov 2026 against the public repo, it matched line for line.
+Clean-protocol extension (leave-one-out over normals, training-only mode size, a-priori or FP-budget contamination, 200 seeds, attack-path split, oracle-value bound, 3 Sep per-stage scoring). About 18 minutes on 2 CPUs:
+
+```bash
+python related/opcua_reanalysis/opcua_clean_protocol.py \
+  data/opcua/opcua_instance1-60_sliced_1min.csv \
+  data/opcua/20250903_Network_OPCUA_enriched_features_instanced_file1.csv \
+  data/opcua/20250903_Network_OPCUA_enriched_features_instanced_file2.csv \
+  --repo /tmp/opcua_repo --seeds 200 --jobs 2
+```
+
+Output: `results_clean_protocol.txt` plus CSVs in `out/`. The write-up is in `FINDINGS.md`.
+
+`results_reproduction.txt` is the original script's output. Rerun on 19 Nov 2026 against the public repo, it matched line for line.
