@@ -223,7 +223,7 @@ The way the decoys are suppressed matters more than the fact that they are. H2 (
 
 \begin{table}[tbp]
 \centering\scriptsize
-\caption{Ablations over \SynSeeds{} seeds (mean$\pm$sd). Top: alarming on every pair that reaches a stage. Bottom: spectral-term variants, beacon stage, with lead-stage F1.}\label{tab:ablate}
+\caption{Ablations over \SynSeeds{} seeds (mean$\pm$sd). Top: alarming on every pair that reaches a stage. Bottom: spectral-term variants.}\label{tab:ablate}
 \begin{tabular}{@{}lccc@{}}
 \toprule
 Configuration & Precision & Recall & False positives\\
@@ -233,7 +233,11 @@ Configuration & Precision & Recall & False positives\\
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:ablate} (top) separates the contributions, and it is a warning about synthetic data. Isolation Forest reduces about 200k pairs to \FunIforestPairs{}, and every one of them clears the SAX and periodicity stages. The first three rows are identical. The generator's background is aperiodic by construction, so this data does not exercise the timing stages as filters. Only corroboration removes the two or three non-malicious pairs per seed. The spectral variants (bottom) show the effect of the fix in Sect.~\ref{sec:spectral}. The slow 6-hour exfiltration beacon has about 120 firings in 30 days. Its confidence is \ExfilConfFix{} with the corrected spectral term, against \ExfilConfOrig{} with the original construction and \ExfilConfNone{} with no spectral term. With the original construction, any pair with at least 60 flows receives the full 0.2 spectral credit regardless of timing. The correction has a cost. Confidence does not require the periodicity test to pass, so the synthetic noisy host (14 flows, IAT CV 1.06) now reaches $c = 0.60$ from one ACF lag plus a spectral peak near the window length, and becomes a beacon-stage false positive. Requiring the periodic test, or at least three cycles within the window, are obvious refinements. We leave them unevaluated so that the real-data configuration stays fixed. Under the earlier scenario-level rule the same runs score F1 \OldEvalF{} on seed 42. On this synthetic set the two rules agree, but only the pair-level rule is well defined when leads share hosts with beacons.
+Table~\ref{tab:ablate} (top) separates the contributions, and it is a warning about synthetic data. Isolation Forest reduces about 200k pairs to \FunIforestPairs{}, and every one of them clears the SAX and periodicity stages. The first three rows are identical. The generator's background is aperiodic by construction, so this data does not exercise the timing stages as filters. Only corroboration removes the two or three non-malicious pairs per seed.
+
+The spectral variants (bottom) show that on this data the spectral term changes nothing that matters. The lead stage is perfect under all three variants. Apart from the noisy host, every pair that reaches Stage~6 is genuinely periodic and has at least 60 observations, so the original construction's constant credit happens to coincide with real evidence. For example, the slow 6-hour exfiltration beacon (about 120 firings) scores \ExfilConfFix{} under both constructions and \ExfilConfNone{} with no spectral term. The fix is still needed: on traffic where aperiodic, high-volume channels reach Stage~6, the original construction awards each of them the full 0.2 credit. But the synthetic data cannot show that. The correction has a cost here. Confidence does not require the periodicity test to pass, so the synthetic noisy host (14 flows, IAT CV 1.06) reaches $c = 0.60$ from one ACF lag plus a spectral peak near the window length, and becomes a beacon-stage false positive on one seed. Requiring the periodic test, or at least three cycles within the window, are obvious refinements. We leave them unevaluated so that the real-data configuration stays fixed.
+
+Under the earlier scenario-level rule the same runs score F1 \OldEvalF{} on seed 42. On this synthetic set the two rules agree, but only the pair-level rule is well defined when leads share hosts with beacons.
 
 \subsection{Real Traffic}
 
@@ -256,7 +260,7 @@ Run & Family & $n_{C2}$ & P$_{\text{beacon}}$ & R$_{\text{beacon}}$ & P$_{\text{
 \section{Discussion and Limitations}\label{sec:discussion}
 %=====================================================================
 
-\paragraph{Synthetic results are an upper bound.} On synthetic data the first stage alone narrows about 200k pairs to a handful that contains every beacon, so perfect scores there say little. The informative synthetic result is structural. Decoys that are as periodic as C2 are removed only by cross-layer evidence, and the system does so on every seed. Real traffic is the actual test.
+\paragraph{Synthetic results are an upper bound.} On synthetic data the first stage alone narrows about 200k pairs to a handful that contains every beacon, so perfect scores there say little. The informative synthetic results are structural. Decoys that are as periodic as C2 survive every timing stage, and corroboration removes them on every seed, but by a margin set by the weights rather than by evidence. Real traffic is the actual test.
 
 \paragraph{DNS evidence must be tied to the connection.} H2 inspects every query the source host made in the window, not the lookups that precede connections to $d$. One DGA-infected or CDN-heavy host therefore lends H2 to all of its periodic pairs, benign ones included. On real networks, where hashed CDN hostnames look algorithmically generated, H2 will fire almost everywhere. That leaves the 0.55 threshold, which was set by hand on synthetic data, to do the separating. Restricting H2 to answers containing $d$ would lose the NXDomain signal of DGA malware, because failed lookups never resolve to the C2 address. The principled fix links each lookup to the connection that follows it within a short interval, and that is our next change.
 

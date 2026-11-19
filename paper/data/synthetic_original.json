@@ -1,0 +1,2784 @@
+[
+ {
+  "seed": 42,
+  "metrics": {
+   "n_pairs_in_conn": 200840,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 7,
+    "tp": 4,
+    "fp": 3,
+    "decoy_fp": 2,
+    "precision": 0.5714,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 7,
+    "tp": 4,
+    "fp": 3,
+    "decoy_fp": 2,
+    "precision": 0.5714,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1022.7
+    ],
+    "beacon_confidence": [
+     0.9748
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3584.7
+    ],
+    "beacon_confidence": [
+     0.9015
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21865.8
+    ],
+    "beacon_confidence": [
+     0.9618
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21866s (confidence: 0.962)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.5
+    ],
+    "beacon_confidence": [
+     0.9504
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: gqp49rwt1m38v.com, 5x9hq42rnv28y.com, qxz79vn5hsd2z9.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,637 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     898.2
+    ],
+    "beacon_confidence": [
+     0.9234
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 898s (confidence: 0.923)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, bl8g4d01jn8723.com, hsgqcvlxh17r3.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.064, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,896 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3603.1
+    ],
+    "beacon_confidence": [
+     0.9741
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3603s (confidence: 0.974)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.024, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (720 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945626,
+   "pairs_in_conn": 200840,
+   "channels_prefiltered": 2351,
+   "anomalous_flows": 15640,
+   "pairs_sax_evaluated": 7,
+   "pairs_sax_pass": 7,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 44.3
+  },
+  "old_evaluator": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "detected": [
+    "exfil_slow",
+    "fast_https_dga",
+    "multi_host_campaign",
+    "slow_http_fixed"
+   ]
+  },
+  "n_conn_rows": 945626,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 0,
+  "metrics": {
+   "n_pairs_in_conn": 200773,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1023.1
+    ],
+    "beacon_confidence": [
+     0.9755
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3603.7
+    ],
+    "beacon_confidence": [
+     0.8964
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21647.6
+    ],
+    "beacon_confidence": [
+     0.9602
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21648s (confidence: 0.960)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.1
+    ],
+    "beacon_confidence": [
+     0.9503
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 5x9hq42rnv28y.com, qxz79vn5hsd2z9.com, v3p5h02c8rj0f.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,635 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     898.6
+    ],
+    "beacon_confidence": [
+     0.9257
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 899s (confidence: 0.926)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, 5g6ks6y27dhzr.com, hsgqcvlxh17r3.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.063, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,889 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3606.5
+    ],
+    "beacon_confidence": [
+     0.9753
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3606s (confidence: 0.975)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.024, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (718 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945617,
+   "pairs_in_conn": 200773,
+   "channels_prefiltered": 2331,
+   "anomalous_flows": 15617,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 43.8
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945617,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 1,
+  "metrics": {
+   "n_pairs_in_conn": 200724,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1024.6
+    ],
+    "beacon_confidence": [
+     0.9747
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3597.3
+    ],
+    "beacon_confidence": [
+     0.898
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21612.2
+    ],
+    "beacon_confidence": [
+     0.9561
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21612s (confidence: 0.956)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     299.7
+    ],
+    "beacon_confidence": [
+     0.9504
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: gqp49rwt1m38v.com, 5x9hq42rnv28y.com, 71rcp1ghgv4xjf.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,644 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     901.5
+    ],
+    "beacon_confidence": [
+     0.9245
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 902s (confidence: 0.924)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, 5g6ks6y27dhzr.com, m75zjkqgh90s.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.062, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,874 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3594.6
+    ],
+    "beacon_confidence": [
+     0.9739
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3595s (confidence: 0.974)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.024, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (722 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945612,
+   "pairs_in_conn": 200724,
+   "channels_prefiltered": 2352,
+   "anomalous_flows": 15612,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 46.1
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945612,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 2,
+  "metrics": {
+   "n_pairs_in_conn": 200823,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1020.8
+    ],
+    "beacon_confidence": [
+     0.9755
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3623.0
+    ],
+    "beacon_confidence": [
+     0.8938
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21578.2
+    ],
+    "beacon_confidence": [
+     0.9589
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21578s (confidence: 0.959)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.5
+    ],
+    "beacon_confidence": [
+     0.9499
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: gqp49rwt1m38v.com, 71rcp1ghgv4xjf.com, v3p5h02c8rj0f.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,637 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     898.6
+    ],
+    "beacon_confidence": [
+     0.9244
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 899s (confidence: 0.924)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: bl8g4d01jn8723.com, 5g6ks6y27dhzr.com, hsgqcvlxh17r3.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.064, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,876 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3599.9
+    ],
+    "beacon_confidence": [
+     0.9755
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3600s (confidence: 0.976)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.024, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (720 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945608,
+   "pairs_in_conn": 200823,
+   "channels_prefiltered": 2323,
+   "anomalous_flows": 15608,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 45.0
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945608,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 3,
+  "metrics": {
+   "n_pairs_in_conn": 200762,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1025.7
+    ],
+    "beacon_confidence": [
+     0.9753
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3595.6
+    ],
+    "beacon_confidence": [
+     0.8999
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21456.0
+    ],
+    "beacon_confidence": [
+     0.9573
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21456s (confidence: 0.957)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.5
+    ],
+    "beacon_confidence": [
+     0.9503
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 71rcp1ghgv4xjf.com, qybk6v24h1cl.com, w67g5cjlzlkfy.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,639 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     900.1
+    ],
+    "beacon_confidence": [
+     0.9256
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 900s (confidence: 0.926)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: hsgqcvlxh17r3.com, m75zjkqgh90s.com, 3kb9v60gx21c1.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.062, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,875 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3586.9
+    ],
+    "beacon_confidence": [
+     0.9751
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3587s (confidence: 0.975)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.024, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (721 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945603,
+   "pairs_in_conn": 200762,
+   "channels_prefiltered": 2333,
+   "anomalous_flows": 15603,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 42.6
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945603,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 4,
+  "metrics": {
+   "n_pairs_in_conn": 200778,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1022.7
+    ],
+    "beacon_confidence": [
+     0.9752
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3603.2
+    ],
+    "beacon_confidence": [
+     0.9012
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21647.1
+    ],
+    "beacon_confidence": [
+     0.9577
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21647s (confidence: 0.958)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.2
+    ],
+    "beacon_confidence": [
+     0.9501
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: gqp49rwt1m38v.com, 5x9hq42rnv28y.com, 8tt6s3qj4ryzf.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,633 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     898.6
+    ],
+    "beacon_confidence": [
+     0.9257
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 899s (confidence: 0.926)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, 5g6ks6y27dhzr.com, hsgqcvlxh17r3.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.061, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,885 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3592.4
+    ],
+    "beacon_confidence": [
+     0.9752
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3592s (confidence: 0.975)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.025, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (720 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945609,
+   "pairs_in_conn": 200778,
+   "channels_prefiltered": 2312,
+   "anomalous_flows": 15609,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 45.2
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945609,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 5,
+  "metrics": {
+   "n_pairs_in_conn": 200792,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1021.4
+    ],
+    "beacon_confidence": [
+     0.9752
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3604.8
+    ],
+    "beacon_confidence": [
+     0.8993
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21421.0
+    ],
+    "beacon_confidence": [
+     0.9614
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21421s (confidence: 0.961)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.8
+    ],
+    "beacon_confidence": [
+     0.9504
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 301s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: gqp49rwt1m38v.com, 5x9hq42rnv28y.com, 71rcp1ghgv4xjf.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,623 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     901.9
+    ],
+    "beacon_confidence": [
+     0.9249
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 902s (confidence: 0.925)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, 4f0dxjnjlkcs9.com, 3kb9v60gx21c1.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.064, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,881 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3602.1
+    ],
+    "beacon_confidence": [
+     0.9748
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3602s (confidence: 0.975)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.025, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (722 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945599,
+   "pairs_in_conn": 200792,
+   "channels_prefiltered": 2345,
+   "anomalous_flows": 15599,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 47.2
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945599,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 6,
+  "metrics": {
+   "n_pairs_in_conn": 200828,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1024.2
+    ],
+    "beacon_confidence": [
+     0.9749
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3623.0
+    ],
+    "beacon_confidence": [
+     0.9032
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21557.7
+    ],
+    "beacon_confidence": [
+     0.9625
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21558s (confidence: 0.963)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     299.7
+    ],
+    "beacon_confidence": [
+     0.9504
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 5x9hq42rnv28y.com, qxz79vn5hsd2z9.com, v3p5h02c8rj0f.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,648 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     899.0
+    ],
+    "beacon_confidence": [
+     0.9243
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 899s (confidence: 0.924)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: bl8g4d01jn8723.com, hsgqcvlxh17r3.com, m75zjkqgh90s.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.066, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,886 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3597.6
+    ],
+    "beacon_confidence": [
+     0.9752
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3598s (confidence: 0.975)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.025, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (720 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945629,
+   "pairs_in_conn": 200828,
+   "channels_prefiltered": 2347,
+   "anomalous_flows": 15629,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 48.6
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945629,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 7,
+  "metrics": {
+   "n_pairs_in_conn": 200715,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1023.0
+    ],
+    "beacon_confidence": [
+     0.9747
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3626.5
+    ],
+    "beacon_confidence": [
+     0.9021
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21873.5
+    ],
+    "beacon_confidence": [
+     0.9585
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21874s (confidence: 0.959)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.3
+    ],
+    "beacon_confidence": [
+     0.9501
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: gqp49rwt1m38v.com, 5x9hq42rnv28y.com, qxz79vn5hsd2z9.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,636 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     899.1
+    ],
+    "beacon_confidence": [
+     0.9248
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 899s (confidence: 0.925)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, 5g6ks6y27dhzr.com, m75zjkqgh90s.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.063, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,885 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3596.5
+    ],
+    "beacon_confidence": [
+     0.9739
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3596s (confidence: 0.974)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.024, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (721 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945609,
+   "pairs_in_conn": 200715,
+   "channels_prefiltered": 2310,
+   "anomalous_flows": 15609,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 43.9
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945609,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 8,
+  "metrics": {
+   "n_pairs_in_conn": 200750,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1025.1
+    ],
+    "beacon_confidence": [
+     0.9748
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3612.1
+    ],
+    "beacon_confidence": [
+     0.8992
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21421.2
+    ],
+    "beacon_confidence": [
+     0.962
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21421s (confidence: 0.962)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     299.9
+    ],
+    "beacon_confidence": [
+     0.95
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: gqp49rwt1m38v.com, 5x9hq42rnv28y.com, qxz79vn5hsd2z9.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,635 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     901.5
+    ],
+    "beacon_confidence": [
+     0.9256
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 902s (confidence: 0.926)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, 5g6ks6y27dhzr.com, 154lqzpcw2g958.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.063, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,887 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3592.7
+    ],
+    "beacon_confidence": [
+     0.9746
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3593s (confidence: 0.975)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.024, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (720 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945610,
+   "pairs_in_conn": 200750,
+   "channels_prefiltered": 2302,
+   "anomalous_flows": 15610,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 44.2
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945610,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ },
+ {
+  "seed": 9,
+  "metrics": {
+   "n_pairs_in_conn": 200819,
+   "n_gt_c2_pairs": 4,
+   "n_gt_c2_pairs_in_conn": 4,
+   "n_gt_c2_pairs_detectable": 4,
+   "n_gt_malicious_other_pairs_in_conn": 0,
+   "strict": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "lenient": {
+    "beacon_stage": {
+     "tp": 4,
+     "fp": 2,
+     "fn": 0,
+     "n_flagged": 6,
+     "precision": 0.6667,
+     "recall": 1.0,
+     "f1": 0.8
+    },
+    "corroborated_stage": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "corroborated_stage_detectable_only": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "n_flagged": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "average_precision": 1.0,
+    "recall_at_10": 1.0,
+    "recall_at_50": 1.0,
+    "recall_at_100": 1.0
+   },
+   "c2_pairs_by_stage": {
+    "corroborated": 4
+   }
+  },
+  "ablation": {
+   "IForest anomaly (stages 1-4)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ SAX pass (stage 5)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ periodicity (stage 6)": {
+    "flagged": 6,
+    "tp": 4,
+    "fp": 2,
+    "decoy_fp": 2,
+    "precision": 0.6667,
+    "recall": 1.0
+   },
+   "+ corroboration (stage 9)": {
+    "flagged": 4,
+    "tp": 4,
+    "fp": 0,
+    "decoy_fp": 0,
+    "precision": 1.0,
+    "recall": 1.0
+   }
+  },
+  "scenarios": [
+   {
+    "scenario": "decoy_ntp",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     1022.9
+    ],
+    "beacon_confidence": [
+     0.9745
+    ],
+    "corroboration_score": [
+     0.5375
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "decoy_windows_update",
+    "label": "decoy",
+    "n_pairs": 1,
+    "stages": [
+     "beacon_uncorroborated"
+    ],
+    "dominant_period_s": [
+     3673.9
+    ],
+    "beacon_confidence": [
+     0.902
+    ],
+    "corroboration_score": [
+     0.39
+    ],
+    "mitre_techniques": [
+     "[]"
+    ]
+   },
+   {
+    "scenario": "exfil_slow",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     21691.3
+    ],
+    "beacon_confidence": [
+     0.9573
+    ],
+    "corroboration_score": [
+     0.674
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 21691s (confidence: 0.957)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}]"
+    ]
+   },
+   {
+    "scenario": "fast_https_dga",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     300.1
+    ],
+    "beacon_confidence": [
+     0.9495
+    ],
+    "corroboration_score": [
+     0.566
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 300s (confidence: 0.950)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 5x9hq42rnv28y.com, qxz79vn5hsd2z9.com, v3p5h02c8rj0f.com'}, {'name': 'Encrypted Channel', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1573/', 'description': 'C2 traffic encrypted to prevent content inspection.', 'technique_id': 'T1573', 'evidence': 'Beacon confirmed periodic with no HTTP payload visibility \u2014 likely encrypted C2 channel (HTTPS/TLS)'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (8,644 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "multi_host_campaign",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     897.9
+    ],
+    "beacon_confidence": [
+     0.9257
+    ],
+    "corroboration_score": [
+     0.71
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 898s (confidence: 0.926)'}, {'name': 'Dynamic Resolution: Domain Generation Algorithms', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1568/002/', 'description': 'Algorithmically generated domains for C2 rendezvous.', 'technique_id': 'T1568.002', 'evidence': 'DGA-generated domains detected: 75n29ctrmskrlz.com, hsgqcvlxh17r3.com, m75zjkqgh90s.com'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.064, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (2,874 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   },
+   {
+    "scenario": "slow_http_fixed",
+    "label": "malicious",
+    "n_pairs": 1,
+    "stages": [
+     "corroborated"
+    ],
+    "dominant_period_s": [
+     3611.3
+    ],
+    "beacon_confidence": [
+     0.9747
+    ],
+    "corroboration_score": [
+     0.93
+    ],
+    "mitre_techniques": [
+     "[{'name': 'Scheduled Transfer', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1029/', 'description': 'Data exfiltration at scheduled intervals matching beacon timing.', 'technique_id': 'T1029', 'evidence': 'Scheduled beacon interval: 3611s (confidence: 0.975)'}, {'name': 'Application Layer Protocol: DNS', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/004/', 'description': 'C2 communication tunneled over DNS queries and responses.', 'technique_id': 'T1071.004', 'evidence': 'DNS query period matches conn-log beacon period, indicating DNS-layer C2 communication'}, {'name': 'Application Layer Protocol: Web Protocols', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1071/001/', 'description': 'C2 communication over HTTP/HTTPS to blend with normal web traffic.', 'technique_id': 'T1071.001', 'evidence': 'Stereotyped HTTP patterns (body_CV=0.025, uri_CV=0.000) consistent with automated C2 polling'}, {'name': 'Masquerading', 'tactic': 'Defense Evasion', 'url': 'https://attack.mitre.org/techniques/T1036/', 'description': 'Beacon traffic disguised as legitimate service communication.', 'technique_id': 'T1036', 'evidence': 'Rare or absent User-Agent string \u2014 beacon masquerading as legitimate traffic'}, {'name': 'Data Encoding', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1132/', 'description': 'Standard or custom encoding of C2 data (e.g., base64 in URI).', 'technique_id': 'T1132', 'evidence': 'High-entropy URI indicates encoded C2 payload data'}, {'name': 'Data Obfuscation', 'tactic': 'Command and Control', 'url': 'https://attack.mitre.org/techniques/T1001/', 'description': 'C2 data encoded or obfuscated within protocol payloads.', 'technique_id': 'T1001', 'evidence': 'Obfuscated data in HTTP URI suggests C2 command/response encoding'}, {'name': 'Exfiltration Over C2 Channel', 'tactic': 'Exfiltration', 'url': 'https://attack.mitre.org/techniques/T1041/', 'description': 'Data exfiltrated over the same channel used for C2.', 'technique_id': 'T1041', 'evidence': 'Sustained periodic communication (719 flows) over beacon channel may indicate data exfiltration'}]"
+    ]
+   }
+  ],
+  "funnel": {
+   "conn_rows": 945593,
+   "pairs_in_conn": 200819,
+   "channels_prefiltered": 2330,
+   "anomalous_flows": 15593,
+   "pairs_sax_evaluated": 6,
+   "pairs_sax_pass": 6,
+   "beacon_pairs": 6,
+   "corroborated_pairs": 4,
+   "conn_only": false,
+   "runtime_s": 46.7
+  },
+  "old_evaluator": null,
+  "n_conn_rows": 945593,
+  "n_mal_pairs": 4,
+  "n_decoy_pairs": 2,
+  "spectral": "original"
+ }
+]

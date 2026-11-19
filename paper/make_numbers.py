@@ -161,6 +161,8 @@ def synthetic(out: list[str]) -> None:
         FP = pm([r["ablation"][cut]["fp"] for r in fx], 1)
         lines.append(f"{cut} & {P} & {R} & {FP} \\\\")
     lines.append(r"\midrule")
+    lines.append(r"\textit{Spectral variant} & \textit{Beacon P} & \textit{Beacon R} & \textit{Lead F1} \\")
+    lines.append(r"\midrule")
     names = {"fixed": "Spectral term on counts (this paper)",
              "original": "Spectral term on IAT index (uninformative)",
              "none": "No spectral term"}
@@ -172,7 +174,7 @@ def synthetic(out: list[str]) -> None:
         bp = pm(col(rs, "strict", "beacon_stage", "precision"))
         br = pm(col(rs, "strict", "beacon_stage", "recall"))
         cp = pm(col(rs, "strict", "corroborated_stage", "f1"))
-        lines.append(f"{names[v]} & {bp} & {br} & F1$_{{corr}}$ {cp} \\\\")
+        lines.append(f"{names[v]} & {bp} & {br} & {cp} \\\\")
     (GEN / "synth_ablate.tex").write_text("\n".join(lines) + "\n")
     out.append("\\newcommand{\\SynAblateRows}{%\n" + "\n".join(lines) + "}\n")
 
