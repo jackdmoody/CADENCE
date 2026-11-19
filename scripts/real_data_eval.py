@@ -53,6 +53,7 @@ CTU13_FAMILY = {1: "Neris", 2: "Neris", 3: "Rbot", 4: "Rbot", 5: "Virut", 6: "Me
 # Covers IRC C2 (Neris, Rbot) and HTTP-style C2 (Sogou, Virut, Menti); smallest captures first
 DEFAULT_CTU13 = [7, 11, 6, 5, 9, 1]
 IOT23_BASE = "https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/IndividualScenarios/"
+H2_LINK = 5.0   # opt-in DNS-linking ablation window (s); set to 0 with --no-h2-link
 SMALL_FILES = ("metrics.json", "gt_pairs_by_stage.csv", "run_summary.json", "run_config.json")
 
 
@@ -192,12 +193,24 @@ def ctu13(n: int, work: Path, results: Path, keep_pcap: bool, skip_full: bool) -
             "published_period_s": None, "published_jitter": None,
             "settings_changed": {"internal_cidr": cidr} if cidr else {},
             "notes": "conn-only headline; truncated full capture", **conn_facts(cdir)}
-    for mode in (["connonly"] + ([] if skip_full else ["full"])):
+    modes = ["connonly"] + ([] if skip_full else ["full"] + (["full_h2link"] if H2_LINK else []))
+    for mode in modes:
         run_dir = d / f"run_{mode}"
-        cadence(cdir, run_dir, gt_csv, extra + (["--conn-only"] if mode == "connonly" else []))
-        package(run_dir, results / f"ctu13_s{n}_{mode}",
-                {**info, "notes": info["notes"] + ("" if mode == "connonly" else
-                 "; FULL run is an ablation: app-layer logs exist mainly for botnet traffic")})
+        flags = list(extra)
+        if mode == "connonly":
+            flags.append("--conn-only")
+        if mode.endswith("h2link"):
+            flags += ["--dns-link-window-s", str(H2_LINK)]
+        note = info["notes"]
+        if mode != "connonly":
+            note += "; FULL run is an ablation: app-layer logs exist mainly for botnet traffic"
+        if mode.endswith("h2link"):
+            note += f"; opt-in H2 linking window {H2_LINK}s (not default)"
+        settings = dict(info["settings_changed"])
+        if mode.endswith("h2link"):
+            settings["dns_link_window_s"] = H2_LINK
+        cadence(cdir, run_dir, gt_csv, flags)
+        package(run_dir, results / f"ctu13_s{n}_{mode}", {**info, "notes": note, "settings_changed": settings})
 
 
 def iot23(name: str, work: Path, results: Path) -> None:
@@ -235,13 +248,17 @@ def acm(a, work: Path, results: Path) -> None:
         floor = max(1.0, a.acm_period / 2)
         extra = ["--min-period-s", str(floor)]
         changed = {"min_period_s": floor, "reason": "published beacon interval below 60 s"}
-    run_dir = d / "run"
-    cadence(cdir, run_dir, gt_csv, extra)
-    package(run_dir, results / f"acm_{a.acm_name}",
-            {"dataset": "Active Countermeasures Malware of the Day", "source_url": a.acm_url,
-             "scenario": a.acm_name, "malware_family": a.acm_name, "published_period_s": a.acm_period,
-             "published_jitter": a.acm_jitter, "settings_changed": changed,
-             "notes": "ground truth = published victim and C2 IPs", **conn_facts(cdir)})
+    base_info = {"dataset": "Active Countermeasures Malware of the Day", "source_url": a.acm_url,
+                 "scenario": a.acm_name, "malware_family": a.acm_name, "published_period_s": a.acm_period,
+                 "published_jitter": a.acm_jitter, "notes": "ground truth = published victim and C2 IPs",
+                 **conn_facts(cdir)}
+    cadence(cdir, d / "run", gt_csv, extra)
+    package(d / "run", results / f"acm_{a.acm_name}", {**base_info, "settings_changed": changed})
+    if H2_LINK:
+        cadence(cdir, d / "run_h2link", gt_csv, extra + ["--dns-link-window-s", str(H2_LINK)])
+        package(d / "run_h2link", results / f"acm_{a.acm_name}_h2link",
+                {**base_info, "settings_changed": {**changed, "dns_link_window_s": H2_LINK},
+                 "notes": base_info["notes"] + f"; opt-in H2 linking window {H2_LINK}s (not default)"})
 
 
 def main() -> None:
@@ -258,7 +275,12 @@ def main() -> None:
     p.add_argument("--results", default=str(ROOT / "results" / "real_data"))
     p.add_argument("--keep-pcap", action="store_true")
     p.add_argument("--skip-full", action="store_true", help="CTU-13: conn-only runs only")
+    p.add_argument("--no-h2-link", action="store_true",
+                   help="skip the extra opt-in H2-linking ablation runs (_h2link)")
     a = p.parse_args()
+    global H2_LINK
+    if a.no_h2_link:
+        H2_LINK = 0.0
     work, results = Path(a.work), Path(a.results)
 
     scen = DEFAULT_CTU13 if a.ctu13 is None else a.ctu13

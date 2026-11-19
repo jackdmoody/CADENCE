@@ -220,12 +220,14 @@ def real(out: list[str]) -> None:
         fam = info.get("malware_family", "")
         b, c = s["beacon_stage"], s["corroborated_stage"]
         stages = m.get("c2_pairs_by_stage", {})
-        top_miss = max(((k, v) for k, v in stages.items() if k not in ("corroborated",)),
+        detected = ("corroborated", "beacon_uncorroborated") if "connonly" in d.name else ("corroborated",)
+        top_miss = max(((k, v) for k, v in stages.items() if k not in detected),
                        key=lambda kv: kv[1], default=("none", 0))
         rows.append(
             f"\\texttt{{{name}}} & {fam} & {m['n_gt_c2_pairs_in_conn']} & "
-            f"{fmt(b['precision'])} & {fmt(b['recall'])} & {fmt(c['precision'])} & {fmt(c['recall'])} & "
-            f"{fmt(s.get('average_precision'))} & "
+            f"{fmt(b['precision'])} & {fmt(b['recall'])} & "
+            + ("-- & -- & " if "connonly" in d.name else f"{fmt(c['precision'])} & {fmt(c['recall'])} & ")
+            + f"{fmt(s.get('average_precision'))} & "
             + (f"{top_miss[0].replace('_', ' ')} ({top_miss[1]})" if top_miss[1] else "none") + " \\\\")
         gp = d / "gt_periodicity.csv"
         pub = info.get("published_period_s")
