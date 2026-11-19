@@ -17,3 +17,4 @@ paper/*.out
 # Python bytecode
 __pycache__/
 *.pyc
+.venv-real/

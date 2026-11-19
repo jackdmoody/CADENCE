@@ -200,11 +200,12 @@ def real(out: list[str]) -> None:
         b, c = s["beacon_stage"], s["corroborated_stage"]
         stages = m.get("c2_pairs_by_stage", {})
         top_miss = max(((k, v) for k, v in stages.items() if k not in ("corroborated",)),
-                       key=lambda kv: kv[1], default=("--", 0))
+                       key=lambda kv: kv[1], default=("none", 0))
         rows.append(
             f"\\texttt{{{name}}} & {fam} & {m['n_gt_c2_pairs_in_conn']} & "
             f"{fmt(b['precision'])} & {fmt(b['recall'])} & {fmt(c['precision'])} & {fmt(c['recall'])} & "
-            f"{fmt(s.get('average_precision'))} & {top_miss[0].replace('_', ' ')} ({top_miss[1]}) \\\\")
+            f"{fmt(s.get('average_precision'))} & "
+            + (f"{top_miss[0].replace('_', ' ')} ({top_miss[1]})" if top_miss[1] else "none") + " \\\\")
         gp = d / "gt_periodicity.csv"
         pub = info.get("published_period_s")
         if pub and gp.exists():
@@ -213,14 +214,24 @@ def real(out: list[str]) -> None:
                 est = g["dominant_period_s"].iloc[0]
                 conf = g["beacon_confidence"].iloc[0] if "beacon_confidence" in g else None
                 jit = info.get("published_jitter", "")
+                if isinstance(jit, (int, float)):
+                    jit = f"{jit * 100:.0f}\\%" if jit <= 1 else f"{jit:.0f}\\%"
+                else:
+                    jit = str(jit or "--").replace("%", "\\%")
                 prow.append(f"\\texttt{{{name}}} & {period_str(pub)} & {jit} & {period_str(est)} & {fmt(conf)} \\\\")
     if not rows:
         rows = [r"\multicolumn{9}{c}{\textit{Real-data runs pending}} \\"]
     (GEN / "real_table.tex").write_text("\n".join(rows) + "\n")
     (GEN / "real_periods.tex").write_text("\n".join(prow) + "\n" if prow else "")
     out.append("\\newcommand{\\RealRows}{%\n" + "\n".join(rows) + "}\n")
-    out.append("\\newcommand{\\RealPeriodRows}{%\n" + ("\n".join(prow) if prow else
-               r"\multicolumn{5}{c}{\textit{pending}} \\") + "}\n")
+    if prow:
+        out.append("\\newcommand{\\RealPeriodTable}{%\n\\begin{table}[tbp]\\centering\\scriptsize\n"
+                   "\\caption{Lab captures with published beacon parameters: published vs.\\ estimated period.}"
+                   "\\label{tab:periods}\n\\begin{tabular}{@{}lrrrr@{}}\\toprule\n"
+                   "Run & Published period & Jitter & Estimated & $c$\\\\\n\\midrule\n"
+                   + "\n".join(prow) + "\n\\bottomrule\\end{tabular}\\end{table}}\n")
+    else:
+        out.append("\\newcommand{\\RealPeriodTable}{}\n")
     out.append(cmd("RealRuns", len(runs)))
 
 
