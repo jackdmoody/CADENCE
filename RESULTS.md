@@ -1,6 +1,6 @@
 # Real-data evaluation day: results (19 Nov 2026)
 
-> **BLOCKED: no real-data CADENCE numbers today.** This run's sandbox network policy refuses the dataset hosts. At 08:11 EST (13:11 UTC), `curl -sI --max-time 20` against `https://mcfp.felk.cvut.cz/publicDatasets/`, `https://www.activecountermeasures.com/` and `https://download.opensuse.org/repositories/security:/zeek/xUbuntu_24.04/` each returned `403 Forbidden (agent proxy: no rule or network setting allows this host)`; over plain HTTP they don't resolve. The environment's network access was not opened for these hosts. So Zeek could not be installed, and CTU-13 (§3), Active Countermeasures (§4) and IoT-23 (§5) did not run. As the brief and the scheduled task say, I did only the GitHub-reachable work (the OPC UA re-analysis) and stopped. To unblock, allow `mcfp.felk.cvut.cz`, `www.activecountermeasures.com` (plus whatever host its download links point to) and `download.opensuse.org` in the environment's network settings, then re-run the task. The commands are below.
+> **BLOCKED: no real-data CADENCE numbers today.** This run's sandbox network policy refuses the dataset hosts. At 08:11 EST (13:11 UTC), `curl -sI --max-time 20` against `https://mcfp.felk.cvut.cz/publicDatasets/`, `https://www.activecountermeasures.com/` and `https://download.opensuse.org/repositories/security:/zeek/xUbuntu_24.04/` each returned `403 Forbidden (agent proxy: no rule or network setting allows this host)`; over plain HTTP they don't resolve. The environment's network access was not opened for these hosts. A second firing of the task arrived at 08:51 EST with a note that the environment now has full network access. I re-checked at 08:51 EST (13:51 UTC), and all three hosts still returned the same proxy 403 (policy denial). The setting change evidently did not reach this already-running session. A fresh session (a new run of the task, not another firing into this one) will probably be needed to pick it up. So Zeek could not be installed, and CTU-13 (§3), Active Countermeasures (§4) and IoT-23 (§5) did not run. As the brief and the scheduled task say, I did only the GitHub-reachable work (the OPC UA re-analysis) and stopped. To unblock, allow `mcfp.felk.cvut.cz`, `www.activecountermeasures.com` (plus whatever host its download links point to) and `download.opensuse.org` in the environment's network settings, then re-run the task. The commands are below.
 
 ## What ran and what did not
 
@@ -117,6 +117,8 @@ python run_real_data.py --zeek-dir <scenario dir> --output results/real_data/iot
 ```
 
 Default-config runs come first. Any flag changed after seeing metrics is "tuned" and gets reported separately.
+
+For the paper build (`paper/make_numbers.py` reads `results/real_data/<run>/`), each run folder should hold `metrics.json`, `gt_pairs_by_stage.csv`, `run_summary.json` and `run_config.json`. It should also hold `gt_periodicity.csv` (the rows of `stages/periodicity.csv` for ground-truth pairs) and `dataset_info.json`. Run names follow the pattern `ctu13_s<N>_connonly`, `ctu13_s<N>_full`, `acm_<sample>` or `iot23_<scenario>`.
 
 ## What this means for the IEA/AIE paper (deadline 15 Dec 2026)
 
