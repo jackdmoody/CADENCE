@@ -67,6 +67,9 @@ def parse_args(argv=None):
     p.add_argument("--min-pair-flows", type=int, help="Minimum flows per channel (default 8)")
     p.add_argument("--max-pairs", type=int, help="Cap on pairs sent to SAX (default 5000)")
     p.add_argument("--contamination", type=float, help="IsolationForest contamination")
+    p.add_argument("--dns-link-window-s", type=float,
+                   help="Opt-in: H2 uses only DNS lookups within this many seconds before a "
+                        "connection to the destination (default 0 = all of the source's lookups)")
     p.add_argument("--zeek-script", action="append", default=[],
                    help="Extra Zeek script/package for --pcap, e.g. ja3")
     return p.parse_args(argv)
@@ -98,6 +101,8 @@ def build_config(args, input_dir: Path, out_dir: Path, conn: pd.DataFrame):
         cfg.pair.max_pairs = args.max_pairs
     if args.contamination is not None:
         cfg.isolation.contamination = args.contamination
+    if getattr(args, "dns_link_window_s", None) is not None:
+        cfg.corroboration.dns_link_window_s = args.dns_link_window_s
     return cfg
 
 

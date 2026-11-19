@@ -1,0 +1,24 @@
+{
+ "host_wide": {
+  "seeds": 11,
+  "mal_min": 0.566,
+  "ben_max": 0.5375,
+  "margin_worst": 0.02849999999999997,
+  "precision_mean": 1.0,
+  "precision_sd": 0.0,
+  "recall_mean": 1.0,
+  "recall_sd": 0.0,
+  "h2_rate": 1.0
+ },
+ "linked5": {
+  "seeds": 11,
+  "mal_min": 0.444,
+  "ben_max": 0.16,
+  "margin_worst": 0.28400000000000003,
+  "precision_mean": 1.0,
+  "precision_sd": 0.0,
+  "recall_mean": 0.75,
+  "recall_sd": 0.0,
+  "h2_rate": 0.329004329004329
+ }
+}

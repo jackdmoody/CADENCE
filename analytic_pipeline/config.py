@@ -223,6 +223,11 @@ class CorroborationConfig:
     dns_min_obs_duty_cycle:        float = 0.50
     nxdomain_rate_threshold:       float = 0.10
     fast_flux_unique_ip_threshold: int   = 5
+    # Opt-in: if > 0, H2 only considers the source's DNS queries made within this many
+    # seconds before a connection to the destination. 0 keeps the original behaviour
+    # (every query the source made in the window), under which CDN/anycast domains
+    # in any host's DNS trip the fast-flux check for all of that host's pairs.
+    dns_link_window_s:             float = 0.0
     global_ua_rare_threshold:      float = 0.01
     high_entropy_uri_frac:         float = 0.25
     extra_benign_domain_suffixes:  Tuple[str, ...] = ()

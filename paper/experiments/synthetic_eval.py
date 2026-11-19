@@ -68,7 +68,7 @@ CUTS = {
 }
 
 
-def run_seed(seed: int, out: Path, days: int, bg: int, noisy: int) -> dict:
+def run_seed(seed: int, out: Path, days: int, bg: int, noisy: int, extra: list | None = None) -> dict:
     d = out / f"seed_{seed}"
     inp = d / "input"
     inp.mkdir(parents=True, exist_ok=True)
@@ -84,7 +84,8 @@ def run_seed(seed: int, out: Path, days: int, bg: int, noisy: int) -> dict:
     gt = gtm.from_pairs(list(map(tuple, mal[["source.ip", "destination.ip"]].drop_duplicates().to_numpy())))
     gt.to_csv(d / "gt.csv", index=False)
 
-    run_real_data.main(["--cadence-dir", str(inp), "--output", str(d / "run"), "--gt", str(d / "gt.csv")])
+    run_real_data.main(["--cadence-dir", str(inp), "--output", str(d / "run"), "--gt", str(d / "gt.csv"),
+                        *(extra or [])])
     metrics = json.loads((d / "run" / "metrics.json").read_text())
     tbl = pd.read_csv(d / "run" / "stages" / "pair_stages.csv", dtype={"src_ip": str, "dst_ip": str})
 
@@ -153,14 +154,18 @@ def main() -> None:
     p.add_argument("--noisy-rows", type=int, default=1_000)
     p.add_argument("--spectral", choices=list(SPECTRAL_VARIANTS), default="fixed",
                    help="Spectral confirmation variant (ablation of the v3.1 fix)")
+    p.add_argument("--dns-link-window-s", type=float, default=None,
+                   help="Opt-in H2 linking window (ablation); default keeps host-wide H2")
     a = p.parse_args()
     _per._fft_dominant_period = SPECTRAL_VARIANTS[a.spectral]
+    extra = ["--dns-link-window-s", str(a.dns_link_window_s)] if a.dns_link_window_s else []
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     results = []
     for s in a.seeds:
-        r = run_seed(s, out, a.days, a.bg_rows, a.noisy_rows)
+        r = run_seed(s, out, a.days, a.bg_rows, a.noisy_rows, extra)
         r["spectral"] = a.spectral
+        r["dns_link_window_s"] = a.dns_link_window_s or 0.0
         m = r["metrics"]["strict"]
         print(f"seed {s:>3}  rows {r['n_conn_rows']:,}  corr P={m['corroborated_stage']['precision']:.3f} "
               f"R={m['corroborated_stage']['recall']:.3f}  beacon P={m['beacon_stage']['precision']:.3f} "

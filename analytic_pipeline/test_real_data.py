@@ -365,3 +365,30 @@ def test_missing_zeek_binary_gives_clear_error(tmp_path):
     from analytic_pipeline.zeek_adapter import run_zeek
     with pytest.raises(FileNotFoundError, match="--zeek-dir"):
         run_zeek([tmp_path / "x.pcap"], tmp_path / "z", zeek_bin="definitely-not-zeek")
+
+
+def test_dns_link_window_restricts_h2_to_lookups_before_connections():
+    """Opt-in linking: CDN lookups at unrelated times no longer trip fast-flux for this pair."""
+    from analytic_pipeline.corroboration import _link_dns_to_connections, score_dns_hypothesis
+    conn_ts = np.arange(10, 10 + 600 * 20, 600.0)              # 20 connections, every 10 min
+    rows = []
+    for t in conn_ts:                                          # C2 lookup 0.2 s before each connection
+        rows.append({"ts": t - 0.2, "src_ip": "10.0.0.5", "query": "c2.example.net",
+                     "rcode_name": "NOERROR", "answers": "203.0.113.9", "TTLs": "60.0"})
+    for i in range(30):                                        # CDN lookups at unrelated times
+        rows.append({"ts": 5000.0 + 97 * i, "src_ip": "10.0.0.5", "query": "cdn.example-cdn.com",
+                     "rcode_name": "NOERROR", "answers": ",".join(f"198.51.100.{j}" for j in range(i % 8, i % 8 + 6)),
+                     "TTLs": "60.0"})
+    dns = pd.DataFrame(rows)
+    dns["ts"] = pd.to_datetime(dns["ts"], unit="s", utc=True)
+    linked = _link_dns_to_connections(dns, conn_ts, 5.0)
+    assert set(linked["query"]) == {"c2.example.net"}
+    assert _link_dns_to_connections(dns, conn_ts, 0.0) is dns   # default: unchanged
+
+    cfg = BDPConfig()
+    host_wide = score_dns_hypothesis({"10.0.0.5"}, {"203.0.113.9"}, dns, 600.0, cfg, link_ts=conn_ts)
+    assert host_wide["h2_dns_anomaly"]                        # CDN trips fast-flux host-wide
+    cfg.corroboration.dns_link_window_s = 5.0
+    linked_res = score_dns_hypothesis({"10.0.0.5"}, {"203.0.113.9"}, dns, 600.0, cfg, link_ts=conn_ts)
+    assert not linked_res["h2_dns_anomaly"]
+    assert linked_res["h1_dns_regularity"] == host_wide["h1_dns_regularity"]   # H1 unaffected

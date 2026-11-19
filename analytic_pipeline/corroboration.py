@@ -201,6 +201,30 @@ def _extract_answer_ips(answers_raw) -> list:
     return [c for c in candidates if ip_pattern.match(c)]
 
 
+def _link_dns_to_connections(
+    src_dns: pd.DataFrame,
+    link_ts: Optional[np.ndarray],
+    window_s: float,
+) -> pd.DataFrame:
+    """Keep DNS rows issued within window_s seconds before some connection in link_ts.
+
+    window_s <= 0 or no timestamps returns src_dns unchanged (original behaviour).
+    """
+    if window_s <= 0 or link_ts is None or len(link_ts) == 0 or src_dns.empty:
+        return src_dns
+    ts = src_dns["ts"]
+    if str(ts.dtype).startswith("datetime64"):
+        q = (pd.to_datetime(ts, utc=True) - pd.Timestamp("1970-01-01", tz="UTC")).dt.total_seconds().to_numpy()
+    else:
+        q = pd.to_numeric(ts, errors="coerce").to_numpy(dtype=float)
+    c = np.sort(np.asarray(link_ts, dtype=float))
+    idx = np.searchsorted(c, q, side="left")          # first connection at or after the query
+    has_next = idx < len(c)
+    nxt = c[np.minimum(idx, len(c) - 1)]
+    keep = has_next & (nxt - q <= window_s) & (nxt - q >= 0)
+    return src_dns[keep]
+
+
 def score_dns_hypothesis(
     src_ips:        set,
     dst_ips:        set,
@@ -208,8 +232,13 @@ def score_dns_hypothesis(
     beacon_period:  float,
     cfg:            BDPConfig,
     window_seconds: float = 0.0,
+    link_ts:        Optional[np.ndarray] = None,
 ) -> dict:
     """Test H1 (DNS regularity) and H2 (DNS anomaly indicators).
+
+    link_ts : connection timestamps (epoch seconds) for the pair. Used only when
+        cfg.corroboration.dns_link_window_s > 0, to restrict H2 to lookups made
+        shortly before a connection to the destination.
 
     Parameters
     ----------
@@ -314,9 +343,10 @@ def score_dns_hypothesis(
     nxdomain_count:    int  = 0
     short_ttl_count:   int  = 0
     fast_flux_domains: list = []
-    total_queries:     int  = len(src_dns)
+    h2_dns = _link_dns_to_connections(src_dns, link_ts, getattr(cc, "dns_link_window_s", 0.0))
+    total_queries:     int  = len(h2_dns)
 
-    for domain, dom_df in src_dns.groupby("query"):
+    for domain, dom_df in h2_dns.groupby("query"):
         domain_str = str(domain)
         if _is_benign_domain(domain_str, benign_sfx):
             continue
@@ -948,9 +978,12 @@ def corroborate_beacon_candidates(
         dst_ips       = {dst}
         beacon_period = float(row.get("dominant_period_s", 0.0))
 
+        link_ts = None
+        if getattr(cfg.corroboration, "dns_link_window_s", 0.0) > 0 and "timestamp" in pair_df.columns:
+            link_ts = pd.to_numeric(pair_df["timestamp"], errors="coerce").dropna().to_numpy(dtype=float)
         dns_result  = score_dns_hypothesis(
             src_ips, dst_ips, dns_df, beacon_period, cfg,
-            window_seconds=window_seconds,
+            window_seconds=window_seconds, link_ts=link_ts,
         )
         http_result = score_http_hypothesis(
             src_ips, dst_ips, http_df, cfg,

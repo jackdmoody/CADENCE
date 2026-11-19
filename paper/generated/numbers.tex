@@ -32,6 +32,18 @@
 \texttt{slow\_http\_fixed} & mal. & 1.00\,h (5\%) & 1.00\,h & 0.97 & 0.93 & corroborated \\
 \texttt{decoy\_ntp} & decoy & 17.1\,min (5\%) & 17.0\,min & 0.97 & 0.54 & beacon uncorroborated \\
 \texttt{decoy\_windows\_update} & decoy & 1.00\,h (20\%) & 59.7\,min & 0.89 & 0.39 & beacon uncorroborated \\}
+\newcommand{\HostMalMin}{0.566}
+\newcommand{\HostBenMax}{0.537}
+\newcommand{\HostMargin}{+0.028}
+\newcommand{\HostLeadR}{1.00}
+\newcommand{\HostLeadP}{1.00}
+\newcommand{\HostHtwoRate}{100}
+\newcommand{\LinkedMalMin}{0.444}
+\newcommand{\LinkedBenMax}{0.160}
+\newcommand{\LinkedMargin}{+0.284}
+\newcommand{\LinkedLeadR}{0.75}
+\newcommand{\LinkedLeadP}{1.00}
+\newcommand{\LinkedHtwoRate}{33}
 \newcommand{\SynAblateRows}{%
 IForest anomaly (stages 1-4) & 0.66$\pm$0.03 & 1.00 & 2.1$\pm$0.3 \\
 + SAX pass (stage 5) & 0.66$\pm$0.03 & 1.00 & 2.1$\pm$0.3 \\
@@ -42,7 +54,12 @@ IForest anomaly (stages 1-4) & 0.66$\pm$0.03 & 1.00 & 2.1$\pm$0.3 \\
 \midrule
 Spectral term on counts (this paper) & 0.66$\pm$0.03 & 1.00 & 1.00 \\
 Spectral term on IAT index (uninformative) & 0.67 & 1.00 & 1.00 \\
-No spectral term & 0.67 & 1.00 & 1.00 \\}
+No spectral term & 0.67 & 1.00 & 1.00 \\
+\midrule
+\textit{H2 scope} & \textit{Lead P} & \textit{Lead R} & \textit{Margin} \\
+\midrule
+All lookups by the source (default) & 1.00 & 1.00 & +0.028 \\
+Lookups $\le$5\,s before a connection to $d$ & 1.00 & 0.75 & +0.284 \\}
 \newcommand{\ExfilConfFix}{0.96}
 \newcommand{\ExfilConfOrig}{0.96}
 \newcommand{\ExfilConfNone}{0.76}

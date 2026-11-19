@@ -175,6 +175,27 @@ def synthetic(out: list[str]) -> None:
         br = pm(col(rs, "strict", "beacon_stage", "recall"))
         cp = pm(col(rs, "strict", "corroborated_stage", "f1"))
         lines.append(f"{names[v]} & {bp} & {br} & {cp} \\\\")
+    mp = DATA / "synthetic_margins.json"
+    if mp.exists():
+        mg = json.loads(mp.read_text())
+        lines.append(r"\midrule")
+        lines.append(r"\textit{H2 scope} & \textit{Lead P} & \textit{Lead R} & \textit{Margin} \\")
+        lines.append(r"\midrule")
+        labels = {"host_wide": "All lookups by the source (default)",
+                  "linked5": "Lookups $\\le$5\\,s before a connection to $d$"}
+        for k, lab in labels.items():
+            if k in mg:
+                g = mg[k]
+                P = f"{g['precision_mean']:.2f}" + (f"$\\pm${g['precision_sd']:.2f}" if g['precision_sd'] > 0.005 else "")
+                R = f"{g['recall_mean']:.2f}" + (f"$\\pm${g['recall_sd']:.2f}" if g['recall_sd'] > 0.005 else "")
+                lines.append(f"{lab} & {P} & {R} & {g['margin_worst']:+.3f} \\\\")
+        for k, tag in (("host_wide", "Host"), ("linked5", "Linked")):
+            if k in mg:
+                g = mg[k]
+                out += [cmd(f"{tag}MalMin", f"{g['mal_min']:.3f}"), cmd(f"{tag}BenMax", f"{g['ben_max']:.3f}"),
+                        cmd(f"{tag}Margin", f"{g['margin_worst']:+.3f}"),
+                        cmd(f"{tag}LeadR", f"{g['recall_mean']:.2f}"), cmd(f"{tag}LeadP", f"{g['precision_mean']:.2f}"),
+                        cmd(f"{tag}HtwoRate", f"{100 * g['h2_rate']:.0f}")]
     (GEN / "synth_ablate.tex").write_text("\n".join(lines) + "\n")
     out.append("\\newcommand{\\SynAblateRows}{%\n" + "\n".join(lines) + "}\n")
 
