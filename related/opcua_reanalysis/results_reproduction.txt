@@ -1,0 +1,100 @@
+====================================================================================================
+1. REPRODUCTION  (train on normal instances 1-10, evaluate on all 60 incl. those 10)
+====================================================================================================
+  IsolationForest contamination=0.05           acc 0.150  F1 0.000  prec 0.000  rec 0.000  (TP 0 FP 1 FN 50 TN 9)
+  IsolationForest contamination=0.1            acc 0.150  F1 0.000  prec 0.000  rec 0.000  (TP 0 FP 1 FN 50 TN 9)
+  IsolationForest contamination=0.15           acc 0.400  F1 0.471  prec 0.889  rec 0.320  (TP 16 FP 2 FN 34 TN 8)
+  IsolationForest contamination=0.2            acc 0.933  F1 0.960  prec 0.960  rec 0.960  (TP 48 FP 2 FN 2 TN 8)
+  IsolationForest contamination=0.25           acc 0.950  F1 0.971  prec 0.943  rec 1.000  (TP 50 FP 3 FN 0 TN 7)
+  IsolationForest contamination=0.3            acc 0.950  F1 0.971  prec 0.943  rec 1.000  (TP 50 FP 3 FN 0 TN 7)
+  IsolationForest contamination=0.35           acc 0.950  F1 0.971  prec 0.943  rec 1.000  (TP 50 FP 3 FN 0 TN 7)
+  IsolationForest contamination=0.4            acc 0.950  F1 0.971  prec 0.943  rec 1.000  (TP 50 FP 3 FN 0 TN 7)
+  IsolationForest contamination=0.45           acc 0.950  F1 0.971  prec 0.943  rec 1.000  (TP 50 FP 3 FN 0 TN 7)
+  IsolationForest contamination=0.5            acc 0.950  F1 0.971  prec 0.943  rec 1.000  (TP 50 FP 3 FN 0 TN 7)
+
+====================================================================================================
+2. TRIVIAL BASELINES  (same 60 instances, no training)
+====================================================================================================
+  Paper: IsolationForest c=0.2 seed 42         acc 0.933  F1 0.960  prec 0.960  rec 0.960  (TP 48 FP 2 FN 2 TN 8)
+  Always alarm                                 acc 0.833  F1 0.909  prec 0.833  rec 1.000  (TP 50 FP 10 FN 0 TN 0)
+  Any write to iSpeedSetPoint in the minute    acc 0.933  F1 0.962  prec 0.926  rec 1.000  (TP 50 FP 4 FN 0 TN 6)
+  Client never seen in normal runs             acc 0.667  F1 0.750  prec 1.000  rec 0.600  (TP 30 FP 0 FN 20 TN 10)
+  Any write to an output tag (o*)              acc 0.417  F1 0.462  prec 1.000  rec 0.300  (TP 15 FP 0 FN 35 TN 10)
+  >=2 setpoint writes OR new client            acc 0.850  F1 0.901  prec 1.000  rec 0.820  (TP 41 FP 0 FN 9 TN 10)
+
+====================================================================================================
+3. WHAT 'MESSAGE SIZE DEVIATION' ENCODES
+====================================================================================================
+id.orig_h     msg_size
+192.168.1.16  165          67
+192.168.1.36  161         100
+  mode size used as 'normal' = 161 bytes
+  192.168.1.16 writes setpoint in instances: normal=[6, 8, 9, 10] attack_count=20
+  192.168.1.36 writes setpoint in instances: normal=[] attack_count=30
+
+====================================================================================================
+4. INDISTINGUISHABLE WITHOUT WRITTEN VALUES  (exactly one HMI setpoint write, no new client)
+====================================================================================================
+ instance       scenario  label  write_ops_count  write_anomaly_count  total_packets  write_ops_ratio  iso_score  iso_pred
+        6   Normal_Speed      0                1                    1          13944         0.000072  -0.160147         1
+        8   Normal_Speed      0                1                    1          10429         0.000096  -0.071401         1
+        9   Normal_Speed      0                1                    1          10728         0.000093   0.026991         0
+       10   Normal_Speed      0                1                    1          10751         0.000093   0.017850         0
+       11  Speed_TooFast      1                1                    1          11272         0.000089  -0.011585         1
+       18  Speed_TooFast      1                1                    1          10159         0.000098  -0.071401         1
+       21  Speed_TooSlow      1                1                    1          10575         0.000095  -0.026445         1
+       22  Speed_TooSlow      1                1                    1          12055         0.000083  -0.058494         1
+       23  Speed_TooSlow      1                1                    1          10820         0.000092   0.017850         0
+       28  Speed_TooSlow      1                1                    1          10442         0.000096  -0.071401         1
+       31 WrongDirection      1                1                    1          10657         0.000094   0.001917         0
+       32 WrongDirection      1                1                    1           7936         0.000126  -0.071401         1
+       33 WrongDirection      1                1                    1           9712         0.000103  -0.071401         1
+  -> iso_pred within this group is decided by total_packets (the ratio denominator), not by anything about the write.
+
+  Recall by attack path (paper's IF c=0.2 / any-setpoint-write rule):
+    HMI (trusted client)       n=20  IF recall 0.90   any-write recall 1.00
+    UA Expert (new client)     n=30  IF recall 1.00   any-write recall 1.00
+  Recall by scenario (paper's IF):
+scenario
+Oscillate         1.0
+Speed_TooFast     1.0
+Speed_TooSlow     0.9
+VariousThreats    1.0
+WrongDirection    0.9
+
+====================================================================================================
+5. SEED SENSITIVITY  (c=0.2, seeds 0-199; FP count on the 10 normals)
+====================================================================================================
+  acc  min 0.467  median 0.933  max 0.950
+  F1   min 0.556  median 0.960  max 0.970
+  share of seeds matching the reported 0.933/0.96: 0.61
+  FP count distribution: {2: 200}
+  TP count distribution: {20: 1, 28: 1, 36: 1, 38: 3, 39: 1, 40: 2, 42: 1, 43: 1, 44: 1, 45: 2, 46: 3, 47: 14, 48: 123, 49: 46}
+  note: contamination=0.2 on 10 training points sets the FP budget to ~2 of the 10 normals by construction,
+        and those same 10 normals are part of the evaluation set.
+
+====================================================================================================
+6. 3 SEP 2025 MULTI-STAGE RUN  (per minute; positives = their Step 3 inst 8-20 and Step 5 inst 106-110)
+====================================================================================================
+  clients seen: ['192.168.1.16', '192.168.1.36']   mode setpoint size this run: 161
+  setpoint writes by minute:
+ instance    id.orig_h  msg_size  n stage
+       16 192.168.1.16       165  1    S3
+       17 192.168.1.16       165  2    S3
+       19 192.168.1.16       165  2    S3
+       21 192.168.1.16       165  2    S4
+      108 192.168.1.36       161  3    S5
+      109 192.168.1.36       161  1    S5
+      110 192.168.1.36       161  3    S5
+  Paper IF (their saved c=0.2 model)           acc 0.874  F1 0.417  prec 0.833  rec 0.278  (TP 5 FP 1 FN 13 TN 92)
+  Any write to iSpeedSetPoint in the minute    acc 0.883  F1 0.480  prec 0.857  rec 0.333  (TP 6 FP 1 FN 12 TN 92)
+  S3: minutes=13  with any setpoint write=3  IF flagged=2
+  S5: minutes=5  with any setpoint write=3  IF flagged=3
+  IF-flagged minutes:
+ instance stage  write_ops_count  write_anomaly_count
+       17    S3                2                    2
+       19    S3                2                    2
+       21    S4                2                    2
+      108    S5                3                    0
+      109    S5                1                    0
+      110    S5                3                    0
